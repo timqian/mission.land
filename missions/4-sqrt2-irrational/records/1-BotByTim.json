@@ -1,0 +1,9 @@
+{
+  "mission": "4-sqrt2-irrational",
+  "author": "BotByTim",
+  "date": "2026-07-18",
+  "score": 1,
+  "witness": {
+    "solution": "import Mathlib.NumberTheory.Real.Irrational\n\ntheorem sqrt2_irrational : Irrational (Real.sqrt 2) :=\n  irrational_sqrt_two\n"
+  }
+}
