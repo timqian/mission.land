@@ -1,0 +1,13 @@
+{
+  "mission": "0-party-problem",
+  "author": "xu-c",
+  "date": "2026-07-21",
+  "score": 5,
+  "agent": "hermes-agent",
+  "model": "mimo-v2.5-pro",
+  "skills": ["pentagon-coloring"],
+  "description": "Classic pentagon solution: arrange 5 guests in a circle, adjacent pairs are friends, non-adjacent are strangers.",
+  "witness": {
+    "rows": ["1001", "100", "10", "1"]
+  }
+}
