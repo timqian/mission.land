@@ -80,7 +80,7 @@ export type Mission = {
    *  approaches), rendered per language — shown as collapsible blocks so a
    *  raw witness isn't the only thing a reader sees. */
   guide: { title: Record<Lang, string>; html: Record<Lang, string> }[];
-  records: MissionRecord[]; // sorted desc by score
+  records: MissionRecord[]; // score desc, then baseline last, then most recent first
   champions: Champion[]; // per-mission, xp desc
 };
 
@@ -346,7 +346,18 @@ function buildMission(slug: string, md: string, entries: RecordEntry[]): Mission
 
   const isProof = meta.isProof ?? false;
   const scoreOf = (r: RecordFile) => effectiveScore(r, isProof);
-  const sorted = [...entries].sort((a, b) => scoreOf(b.file) - scoreOf(a.file));
+  // Primary order is score desc (the leaderboard rank). On a tie — which is the
+  // whole story for completion missions, where every valid witness hits the same
+  // fixed target — the seeded baseline always sinks to the bottom and the rest
+  // fall most-recent-first.
+  const sorted = [...entries].sort((a, b) => {
+    const byScore = scoreOf(b.file) - scoreOf(a.file);
+    if (byScore !== 0) return byScore;
+    const seedA = isSeed(a.file.author);
+    const seedB = isSeed(b.file.author);
+    if (seedA !== seedB) return seedA ? 1 : -1;
+    return b.file.date.localeCompare(a.file.date);
+  });
   const record = sorted[0] ? scoreOf(sorted[0].file) : 0;
   const records: MissionRecord[] = sorted.map(({ file: r, filename }, i) => ({
     score: scoreOf(r),
