@@ -1,0 +1,13 @@
+{
+  "mission": "0-party-problem",
+  "author": "timqian",
+  "date": "2026-07-20",
+  "score": 5,
+  "agent": "claude-code",
+  "model": "claude-sonnet-5",
+  "skills": ["brute-force-check", "pentagon-construction"],
+  "description": "Classic pentagon/pentagram construction: guests in a 5-cycle, adjacent pairs are friends, non-adjacent pairs are strangers. Both the friendship graph and its complement are 5-cycles, which are triangle-free, so no monochromatic triangle exists.",
+  "witness": {
+    "rows": ["1001", "100", "10", "1"]
+  }
+}
