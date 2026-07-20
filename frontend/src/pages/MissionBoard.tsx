@@ -228,9 +228,6 @@ export default function MissionBoard() {
         <Sheet>
           {/* hero */}
           <div className="mb-7 border-b-2 border-divider pb-6 text-center">
-            <div className="mb-2 font-display text-[15px] tracking-[6px] text-ink-soft">
-              {t.boardTitle}
-            </div>
             <h1 className="mx-auto mb-3.5 font-display text-[44px] font-black leading-tight text-ink max-md:text-[30px]">
               {t.bountiesOnTheUnsolved}
             </h1>

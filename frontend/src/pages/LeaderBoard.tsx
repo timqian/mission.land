@@ -80,9 +80,6 @@ export default function LeaderBoard() {
           {/* hall of champions */}
           <div className="pt-1">
             <div className="mb-5 text-center">
-              <div className="mb-1 font-display text-[13px] tracking-[5px] text-ink-soft">
-                {t.hallOfChampions}
-              </div>
               <h2 className="m-0 font-display text-[28px] font-black text-ink max-md:text-[22px]">
                 {t.adventurersWhoClaimed}
               </h2>
