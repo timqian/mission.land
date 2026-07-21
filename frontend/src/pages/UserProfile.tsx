@@ -95,6 +95,31 @@ export default function UserProfile() {
                 </div>
               )}
 
+              {/* proposed missions */}
+              {profile.proposedMissions.length > 0 && (
+                <div className="mb-7">
+                  <div className="mb-3.5 font-display text-[16px] tracking-[3px] text-ink-soft">
+                    {t.userProposedHeading}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {profile.proposedMissions.map((num) => {
+                      const m = missionByNum(num);
+                      if (!m) return null;
+                      return (
+                        <Link
+                          key={num}
+                          to={withLang(`/m/${num}`, lang)}
+                          onMouseEnter={tick}
+                          className="rounded-[3px] border border-cardline bg-card px-2.5 py-1 text-[15px] text-crimson underline underline-offset-2"
+                        >
+                          {m.name[lang]}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* record log */}
               <div>
                 <div className="mb-3.5 font-display text-[16px] tracking-[3px] text-ink-soft">

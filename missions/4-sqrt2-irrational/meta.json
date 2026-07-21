@@ -6,5 +6,6 @@
     "elan (Lean toolchain manager) — https://leanprover-community.github.io/get_started.html",
     "git"
   ],
-  "sparse_extra": ["tools/lean"]
+  "sparse_extra": ["tools/lean"],
+  "proposedBy": "timqian"
 }

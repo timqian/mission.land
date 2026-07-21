@@ -75,6 +75,8 @@ export type Mission = {
   literatureBroken: boolean; // record has reached/surpassed the literature record
   bounty: number; // XP for the next breakthrough
   adventurers: number;
+  /** GitHub handle of whoever proposed this mission (meta.json), if recorded. */
+  proposedBy?: string;
   loreHtml: Record<Lang, string>; // rendered Problem section, per language
   /** Remaining mission.md sections (Score, Witness format, Reward, Known
    *  approaches), rendered per language — shown as collapsible blocks so a
@@ -215,6 +217,11 @@ const recordJsons = import.meta.glob("../../../missions/*/records/*.json", {
   eager: true,
 }) as Record<string, RecordFile>;
 
+const metaJsons = import.meta.glob("../../../missions/*/meta.json", {
+  import: "default",
+  eager: true,
+}) as Record<string, { proposedBy?: string }>;
+
 const i18nMissionMds = import.meta.glob("../../../i18n/*/*.md", {
   query: "?raw",
   import: "default",
@@ -291,6 +298,13 @@ function effectiveScore(r: RecordFile, isProof: boolean): number {
 /** Flat bonus for a breakthrough that surpasses the published literature record. */
 export const LITERATURE_BREAKTHROUGH_XP = 100000;
 
+/** Flat, one-time reward for proposing a mission that gets accepted (see
+ *  CONTRIBUTING.md: mission.md + verify.py + baseline witness). Attributed to
+ *  meta.json's `proposedBy`, independent of whether that person ever submits
+ *  a record — on par with a construction breakthrough (5000), since curating
+ *  a good verifiable problem is comparable work to solving one. */
+export const MISSION_PROPOSAL_XP = 5000;
+
 /** Base XP reward, derived from a mission's shape rather than set per mission:
  *  a tutorial/practice trial pays a token 100, a construction breakthrough pays
  *  5000, and cracking a proof mission pays 100000. Surpassing a literature
@@ -300,7 +314,12 @@ function missionXp(isProof: boolean, rewardMode: Mission["rewardMode"]): number 
   return isProof ? 100000 : 5000; // proof mission vs construction breakthrough
 }
 
-function buildMission(slug: string, md: string, entries: RecordEntry[]): Mission {
+function buildMission(
+  slug: string,
+  md: string,
+  entries: RecordEntry[],
+  proposedBy: string | undefined,
+): Mission {
   const files = entries.map((e) => e.file);
   const num = parseInt(slug.match(/^(\d+)/)?.[1] ?? "0", 10);
   const id = String(num);
@@ -408,6 +427,11 @@ function buildMission(slug: string, md: string, entries: RecordEntry[]): Mission
     }
   }
 
+  // Note: the proposer reward is deliberately NOT folded into `champions` — the
+  // "champions of this mission" list ranks record holders, and a proposer is
+  // surfaced separately (mission page's proposer block). It still counts toward
+  // global totals (see `hall` and `userProfile`), which add it back in.
+
   return {
     id,
     slug,
@@ -427,6 +451,7 @@ function buildMission(slug: string, md: string, entries: RecordEntry[]): Mission
     // current record has already reached the published literature record.
     bounty: literature && record >= literature ? LITERATURE_BREAKTHROUGH_XP : xpPerBreakthrough,
     adventurers: new Set(files.filter((r) => !isSeed(r.author)).map((r) => r.author)).size,
+    proposedBy,
     loreHtml,
     guide,
     records,
@@ -442,7 +467,8 @@ export const missions: Mission[] = Object.entries(missionMds)
     const entries = Object.entries(recordJsons)
       .filter(([p]) => p.includes(`/${slug}/`))
       .map(([p, file]) => ({ file, filename: p.split("/").at(-1)! }));
-    return buildMission(slug, md, entries);
+    const metaEntry = Object.entries(metaJsons).find(([p]) => p.includes(`/${slug}/`));
+    return buildMission(slug, md, entries, metaEntry?.[1].proposedBy);
   })
   .sort((a, b) => a.num - b.num);
 
@@ -450,32 +476,96 @@ export function missionByNum(num: number): Mission | undefined {
   return missions.find((q) => q.num === num);
 }
 
-/** Global Hall of Champions: adventurers ranked by records claimed, then XP. */
-export const hall: HallEntry[] = (() => {
-  const by = new Map<string, { records: number; xp: number; holds: string[] }>();
+type HallAgg = {
+  records: number;
+  solveXp: number; // XP from record breakthroughs
+  proposeXp: number; // XP from accepted mission proposals
+  holds: string[]; // missions where this author holds the current record
+  proposed: string[]; // missions this author proposed
+};
+
+/** One pass over every mission, splitting each person's XP into what they earned
+ *  by solving (record breakthroughs) vs by proposing accepted missions. The
+ *  combined hall and the two focused boards below all derive from this. */
+const hallAgg: Map<string, HallAgg> = (() => {
+  const by = new Map<string, HallAgg>();
+  const entry = (author: string) => {
+    const cur = by.get(author) ?? { records: 0, solveXp: 0, proposeXp: 0, holds: [], proposed: [] };
+    by.set(author, cur);
+    return cur;
+  };
   for (const q of missions) {
     for (const c of q.champions) {
-      const cur = by.get(c.author) ?? { records: 0, xp: 0, holds: [] };
+      const cur = entry(c.author);
       cur.records += c.records;
-      cur.xp += c.xp;
-      by.set(c.author, cur);
+      cur.solveXp += c.xp;
     }
     const top = q.records[0];
-    if (top && !top.seed && q.rewardMode !== "completion") by.get(top.author)?.holds.push(q.name.en);
+    if (top && !top.seed && q.rewardMode !== "completion") entry(top.author).holds.push(q.name.en);
+    // Proposer reward — counted even if the proposer holds no records.
+    if (q.proposedBy && !isSeed(q.proposedBy)) {
+      const cur = entry(q.proposedBy);
+      cur.proposeXp += MISSION_PROPOSAL_XP;
+      cur.proposed.push(q.name.en);
+    }
   }
-  return [...by.entries()]
-    .map(([author, v]) => ({
-      author,
-      isAgent: author.startsWith("agent://"),
-      records: v.records,
-      xp: v.xp,
-      note:
-        v.holds.length > 0
-          ? `holds the record on ${v.holds.join(" & ")}`
-          : "pushed a verified bound",
-    }))
-    .sort((a, b) => b.records - a.records || b.xp - a.xp);
+  return by;
 })();
+
+const isAgentAuthor = (author: string) => author.startsWith("agent://");
+
+/** "A & B" for up to two names, else "N missions" — keeps hall notes short. */
+function nameList(names: string[]): string {
+  return names.length <= 2 ? names.join(" & ") : `${names.length} missions`;
+}
+
+/** Global Hall of Champions: everyone, ranked by records claimed then total XP
+ *  (solving + proposing combined). */
+export const hall: HallEntry[] = [...hallAgg.entries()]
+  .map(([author, v]) => ({
+    author,
+    isAgent: isAgentAuthor(author),
+    records: v.records,
+    xp: v.solveXp + v.proposeXp,
+    note:
+      v.holds.length > 0
+        ? `holds the record on ${nameList(v.holds)}`
+        : v.records > 0
+          ? "pushed a verified bound"
+          : v.proposed.length > 0
+            ? `proposed ${nameList(v.proposed)}`
+            : "pushed a verified bound",
+  }))
+  .sort((a, b) => b.xp - a.xp || b.records - a.records);
+
+/** Solvers' board: only those who claimed a record, ranked by records then the
+ *  XP earned solving (proposal XP excluded). */
+export const solversHall: HallEntry[] = [...hallAgg.entries()]
+  .filter(([, v]) => v.records > 0)
+  .map(([author, v]) => ({
+    author,
+    isAgent: isAgentAuthor(author),
+    records: v.records,
+    xp: v.solveXp,
+    note:
+      v.holds.length > 0
+        ? `holds the record on ${nameList(v.holds)}`
+        : "pushed a verified bound",
+  }))
+  .sort((a, b) => b.xp - a.xp || b.records - a.records);
+
+/** Proposers' board: only those whose proposed mission was accepted, ranked by
+ *  missions proposed then proposal XP. Here `records` is the proposed count. */
+export const proposersHall: HallEntry[] = [...hallAgg.entries()]
+  .filter(([, v]) => v.proposed.length > 0)
+  .map(([author, v]) => ({
+    author,
+    isAgent: isAgentAuthor(author),
+    records: v.proposed.length,
+    xp: v.proposeXp,
+    note: `proposed ${nameList(v.proposed)}`,
+  }))
+  .sort((a, b) => b.xp - a.xp || b.records - a.records);
 
 export type UserRecord = MissionRecord & { missionNum: number };
 
@@ -484,6 +574,9 @@ export type UserProfile = {
   isAgent: boolean;
   totalXp: number;
   records: UserRecord[]; // newest first
+  /** Missions this author proposed (meta.json's `proposedBy`), by number —
+   *  look up via missionByNum to render a localized name/link. */
+  proposedMissions: number[];
   /** distinct values, most-used first */
   agentsUsed: string[];
   modelsUsed: string[];
@@ -491,9 +584,11 @@ export type UserProfile = {
 };
 
 /** Everything a given author has submitted, aggregated across missions.
- *  Returns undefined if the author has no records at all (typo'd handle etc). */
+ *  Returns undefined if the author has no records and proposed no missions
+ *  (typo'd handle etc). */
 export function userProfile(author: string): UserProfile | undefined {
   const records: UserRecord[] = [];
+  const proposedMissions: number[] = [];
   const agentCounts = new Map<string, number>();
   const modelCounts = new Map<string, number>();
   const skillCounts = new Map<string, number>();
@@ -507,10 +602,14 @@ export function userProfile(author: string): UserProfile | undefined {
       if (r.model) modelCounts.set(r.model, (modelCounts.get(r.model) ?? 0) + 1);
       for (const s of r.skills ?? []) skillCounts.set(s, (skillCounts.get(s) ?? 0) + 1);
     }
+    if (m.proposedBy === author && !isSeed(author)) {
+      proposedMissions.push(m.num);
+      totalXp += MISSION_PROPOSAL_XP; // proposer reward isn't in `champions`
+    }
     const champ = m.champions.find((c) => c.author === author);
     if (champ) totalXp += champ.xp;
   }
-  if (records.length === 0) return undefined;
+  if (records.length === 0 && proposedMissions.length === 0) return undefined;
 
   const byFrequency = (counts: Map<string, number>) =>
     [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([k]) => k);
@@ -520,6 +619,7 @@ export function userProfile(author: string): UserProfile | undefined {
     isAgent: author.startsWith("agent://"),
     totalXp,
     records: records.sort((a, b) => b.date.localeCompare(a.date)),
+    proposedMissions,
     agentsUsed: byFrequency(agentCounts),
     modelsUsed: byFrequency(modelCounts),
     skillsUsed: byFrequency(skillCounts),

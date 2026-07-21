@@ -55,6 +55,7 @@ type Dict = {
   copyToAgent: string;
   copiedToClipboard: string;
   missionId: (id: string) => string;
+  proposedByLabel: (handle: string) => string;
   record: string;
   towardLiterature: (pct: number, literature: number) => string;
   bountyXp: (xp: string) => string;
@@ -81,6 +82,14 @@ type Dict = {
   adventurersWhoClaimed: string;
   hallEmpty: string;
   hallNote: string;
+  solversBoard: string;
+  solversBoardNote: string;
+  proposersBoard: string;
+  proposersBoardNote: string;
+  proposedColumn: string;
+  tabOverall: string;
+  tabSolvers: string;
+  tabProposers: string;
   automaton: string;
   records: string;
   xp: string;
@@ -115,6 +124,8 @@ type Dict = {
   conquestSolvedHint: string;
   championsOfThisMission: string;
   noChampionYet: string;
+  missionProposer: string;
+  proposalRewardXp: (xp: string) => string;
 
   // record detail modal
   recordScore: string;
@@ -136,6 +147,7 @@ type Dict = {
   userSkillsUsed: string;
   userRecordsHeading: string;
   userNoRecords: string;
+  userProposedHeading: string;
 };
 
 const EN: Dict = {
@@ -158,6 +170,7 @@ const EN: Dict = {
   copyToAgent: "Copy this to your agent",
   copiedToClipboard: "✓ Copied to clipboard",
   missionId: (id) => `MISSION · ${id}`,
+  proposedByLabel: (handle) => `Proposed by ${handle}`,
   record: "Record",
   towardLiterature: (pct, literature) =>
     `${pct}% toward literature ≥ ${literature.toLocaleString("en-US")}`,
@@ -183,6 +196,14 @@ const EN: Dict = {
   adventurersWhoClaimed: "Adventurers who claimed a record",
   hallEmpty: "The hall stands empty. The first verified record claims the throne.",
   hallNote: "Ranked by verified records claimed under your GitHub account · anyone may enter the hall.",
+  solversBoard: "Top Solvers",
+  solversBoardNote: "Ranked by verified records claimed — proposal XP excluded.",
+  proposersBoard: "Top Mission Proposers",
+  proposersBoardNote: "Ranked by accepted missions proposed.",
+  proposedColumn: "MISSIONS",
+  tabOverall: "Overall",
+  tabSolvers: "Solvers",
+  tabProposers: "Proposers",
   automaton: "AUTOMATON",
   records: "RECORDS",
   xp: "XP",
@@ -255,6 +276,8 @@ const EN: Dict = {
   conquestSolvedHint: "This conquest is over — the accepted proof is in the record log below.",
   championsOfThisMission: "CHAMPIONS OF THIS MISSION",
   noChampionYet: "No adventurer has claimed this bounty yet. First blood awaits.",
+  missionProposer: "Mission proposed by",
+  proposalRewardXp: (xp) => `+${xp} XP proposal reward`,
 
   recordScore: "Score",
   proofProved: "Proved",
@@ -271,6 +294,7 @@ const EN: Dict = {
   userModelsUsed: "Models",
   userSkillsUsed: "Techniques",
   userRecordsHeading: "RECORD LOG",
+  userProposedHeading: "PROPOSED MISSIONS",
   userNoRecords: "No records yet — this adventurer hasn't submitted anything mission.land can see.",
 };
 
@@ -294,6 +318,7 @@ const ZH: Dict = {
   copyToAgent: "把这段话复制给你的 agent",
   copiedToClipboard: "✓ 已复制到剪贴板",
   missionId: (id) => `任务 · ${id}`,
+  proposedByLabel: (handle) => `由 ${handle} 提出`,
   record: "纪录",
   towardLiterature: (pct, literature) =>
     `${pct}% 距离文献纪录 ≥ ${literature.toLocaleString("zh-CN")}`,
@@ -319,6 +344,14 @@ const ZH: Dict = {
   adventurersWhoClaimed: "已认领纪录的冒险者",
   hallEmpty: "大厅尚空。第一个被验证的纪录将登上王座。",
   hallNote: "按你在 GitHub 账号下认领的已验证纪录排序 · 任何人都能进入大厅。",
+  solversBoard: "解题得分榜",
+  solversBoardNote: "按认领的已验证纪录排序——不含出题 XP。",
+  proposersBoard: "出题得分榜",
+  proposersBoardNote: "按被采纳的出题数排序。",
+  proposedColumn: "出题数",
+  tabOverall: "总榜",
+  tabSolvers: "解题榜",
+  tabProposers: "出题榜",
   automaton: "自动机",
   records: "纪录数",
   xp: "XP",
@@ -391,6 +424,8 @@ const ZH: Dict = {
   conquestSolvedHint: "此征服战已经结束——被接受的证明在下方的纪录日志里。",
   championsOfThisMission: "本任务冠军",
   noChampionYet: "尚无冒险者认领此悬赏。第一滴血等待勇者。",
+  missionProposer: "任务提出者",
+  proposalRewardXp: (xp) => `提出任务奖励 +${xp} XP`,
 
   recordScore: "得分",
   proofProved: "已证明",
@@ -407,6 +442,7 @@ const ZH: Dict = {
   userModelsUsed: "使用过的模型",
   userSkillsUsed: "使用过的技巧",
   userRecordsHeading: "纪录日志",
+  userProposedHeading: "提出的任务",
   userNoRecords: "还没有纪录——这位冒险者尚未提交任何 mission.land 能看到的东西。",
 };
 
@@ -430,6 +466,7 @@ const JA: Dict = {
   copyToAgent: "これをエージェントにコピー",
   copiedToClipboard: "✓ コピーしました",
   missionId: (id) => `ミッション · ${id}`,
+  proposedByLabel: (handle) => `${handle} が提案`,
   record: "記録",
   towardLiterature: (pct, literature) =>
     `${pct}% 文献記録 ≥ ${literature.toLocaleString("ja-JP")} に向けて`,
@@ -455,6 +492,14 @@ const JA: Dict = {
   adventurersWhoClaimed: "記録を達成した冒険者",
   hallEmpty: "英雄の間はまだ空です。最初の検証済み記録が玉座を手にします。",
   hallNote: "GitHub アカウントで達成した検証済み記録数でランク付け · 誰でも入場できます。",
+  solversBoard: "解答得点ランキング",
+  solversBoardNote: "達成した検証済み記録数でランク付け（出題 XP は除く）。",
+  proposersBoard: "出題得点ランキング",
+  proposersBoardNote: "採用された出題数でランク付け。",
+  proposedColumn: "出題数",
+  tabOverall: "総合",
+  tabSolvers: "解答",
+  tabProposers: "出題",
   automaton: "自動人形",
   records: "記録数",
   xp: "XP",
@@ -527,6 +572,8 @@ const JA: Dict = {
   conquestSolvedHint: "この征服戦は終わりました——受理された証明は下の記録ログにあります。",
   championsOfThisMission: "このミッションのチャンピオン",
   noChampionYet: "まだ冒険者がこの懸賞を達成していません。ファーストブラッドを待っています。",
+  missionProposer: "ミッション提案者",
+  proposalRewardXp: (xp) => `提案報酬 +${xp} XP`,
 
   recordScore: "スコア",
   proofProved: "証明済み",
@@ -543,6 +590,7 @@ const JA: Dict = {
   userModelsUsed: "使用したモデル",
   userSkillsUsed: "使用した手法",
   userRecordsHeading: "記録ログ",
+  userProposedHeading: "提案したミッション",
   userNoRecords: "まだ記録がありません——この冒険者は mission.land から見えるものをまだ何も提出していません。",
 };
 
@@ -566,6 +614,7 @@ const KO: Dict = {
   copyToAgent: "이것을 에이전트에게 복사하세요",
   copiedToClipboard: "✓ 클립보드에 복사됨",
   missionId: (id) => `미션 · ${id}`,
+  proposedByLabel: (handle) => `${handle}이(가) 제안`,
   record: "기록",
   towardLiterature: (pct, literature) =>
     `${pct}% 문헌 기록 ≥ ${literature.toLocaleString("ko-KR")}를 향해`,
@@ -591,6 +640,14 @@ const KO: Dict = {
   adventurersWhoClaimed: "기록을 달성한 모험가",
   hallEmpty: "전당은 아직 비어 있습니다. 첫 번째 검증된 기록이 왕좌를 차지합니다.",
   hallNote: "GitHub 계정으로 달성한 검증된 기록 수로 순위 결정 · 누구나 입장할 수 있습니다.",
+  solversBoard: "문제 해결 점수",
+  solversBoardNote: "달성한 검증된 기록 수로 순위 — 출제 XP 제외.",
+  proposersBoard: "출제 점수",
+  proposersBoardNote: "채택된 출제 수로 순위.",
+  proposedColumn: "출제 수",
+  tabOverall: "종합",
+  tabSolvers: "해결",
+  tabProposers: "출제",
   automaton: "자동 장치",
   records: "기록 수",
   xp: "XP",
@@ -663,6 +720,8 @@ const KO: Dict = {
   conquestSolvedHint: "이 정복전은 끝났습니다 — 승인된 증명은 아래 기록 로그에 있습니다.",
   championsOfThisMission: "이 미션의 챔피언",
   noChampionYet: "아직 모험가가 이 현상금을 달성하지 않았습니다. 퍼스트 블러드를 노려보세요.",
+  missionProposer: "미션 제안자",
+  proposalRewardXp: (xp) => `제안 보상 +${xp} XP`,
 
   recordScore: "점수",
   proofProved: "증명 완료",
@@ -679,6 +738,7 @@ const KO: Dict = {
   userModelsUsed: "사용한 모델",
   userSkillsUsed: "사용한 기법",
   userRecordsHeading: "기록 로그",
+  userProposedHeading: "제안한 미션",
   userNoRecords: "아직 기록이 없습니다 — 이 모험가는 mission.land에서 볼 수 있는 것을 아직 제출하지 않았습니다.",
 };
 

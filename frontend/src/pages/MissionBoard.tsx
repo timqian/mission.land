@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Footer, Nav, Sheet, authorLabel } from "../components/chrome";
+import { Footer, GithubAvatar, Nav, Sheet, authorLabel } from "../components/chrome";
 import {
-  LITERATURE_BREAKTHROUGH_XP,
+  MISSION_PROPOSAL_XP,
   REPO_URL,
   conquestSolved,
   genericAgentPrompt,
@@ -28,7 +28,7 @@ function MissionCard({ q }: { q: Mission }) {
       to={withLang(`/m/${q.num}`, lang)}
       onMouseEnter={tick}
       onClick={chime}
-      className="qcard relative block origin-top p-5 transition-transform duration-200 ease-out hover:-rotate-[1.8deg] motion-reduce:hover:rotate-0"
+      className="qcard relative flex flex-col origin-top p-5 transition-transform duration-200 ease-out hover:-rotate-[1.8deg] motion-reduce:hover:rotate-0"
     >
       <span
         className="absolute -top-[18px] left-1/2 flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full font-display text-[9px] font-black leading-none text-[#f7dede] shadow-[0_1px_3px_rgba(0,0,0,.4)]"
@@ -43,51 +43,59 @@ function MissionCard({ q }: { q: Mission }) {
         {t.missionId(q.id)}
       </div>
       <h3 className="mb-3 text-center font-display text-[19px] font-bold text-ink">{q.name[lang]}</h3>
+      {/* One rhythm across every card: eyebrow label → hero value → one
+          supporting line → one gold reward line. The hero is the number that
+          matters for that mission type; everything else stays quiet. */}
       {q.rewardMode === "completion" ? (
         <>
-          <div className="flex items-baseline justify-between border-t border-dashed border-cardline pt-2 text-[19px]">
-            <span>{t.tutorialBadge}</span>
-            <b className="text-[24px]">{q.adventurers}</b>
+          <div className="border-t border-dashed border-cardline pt-3 text-center">
+            <div className="font-display text-[11px] tracking-[3px] text-ink-soft">
+              {t.tutorialBadge}
+            </div>
+            <div className="font-display text-[44px] font-black leading-none text-ink">
+              {q.adventurers}
+            </div>
           </div>
-          <div className="mt-2 mb-1 text-[15px] text-ink-muted">{t.tutorialHint}</div>
-          <div className="mt-3 text-center text-[17px] font-bold text-gold">
+          <div className="mt-2.5 text-center text-[13px] text-ink-soft">{t.tutorialHint}</div>
+          <div className="mt-2.5 text-center text-[15px] font-bold text-gold">
             {t.flatRewardXp(formatNumber(q.bounty, lang))}
           </div>
         </>
       ) : q.rewardMode === "conquest" ? (
-        conquestSolved(q) ? (
-          <>
-            <div className="flex items-baseline justify-between border-t border-dashed border-cardline pt-2 text-[19px]">
-              <span>{t.conquestBadge}</span>
-              <b className="text-[20px] tracking-[1px] text-gold">{t.conquestSolvedBadge}</b>
+        <>
+          <div className="border-t border-dashed border-cardline pt-3 text-center">
+            <div className="font-display text-[11px] tracking-[3px] text-ink-soft">
+              {t.conquestBadge}
             </div>
-            <div className="mt-2 mb-1 text-[15px] text-ink-muted">{t.conquestSolvedHint}</div>
-            <div className="mt-3 text-center text-[17px] font-bold text-gold">
-              {t.conquestClaimedBy(
-                formatNumber(q.bounty, lang),
-                authorLabel(q.champions[0]?.author ?? ""),
-              )}
+            <div
+              className={`font-display text-[26px] font-black leading-tight tracking-[1px] ${
+                conquestSolved(q) ? "text-gold" : "text-crimson"
+              }`}
+            >
+              {conquestSolved(q) ? t.conquestSolvedBadge : t.conquestOpen}
             </div>
-          </>
-        ) : (
-          <>
-            <div className="flex items-baseline justify-between border-t border-dashed border-cardline pt-2 text-[19px]">
-              <span>{t.conquestBadge}</span>
-              <b className="text-[20px] tracking-[1px] text-crimson">{t.conquestOpen}</b>
-            </div>
-            <div className="mt-2 mb-1 text-[15px] text-ink-muted">{t.conquestHint}</div>
-            <div className="mt-3 text-center text-[17px] font-bold text-gold">
-              {t.conquestRewardXp(formatNumber(q.bounty, lang))}
-            </div>
-          </>
-        )
+          </div>
+          <div className="mt-2.5 text-center text-[13px] text-ink-soft">
+            {conquestSolved(q) ? t.conquestSolvedHint : t.conquestHint}
+          </div>
+          <div className="mt-2.5 text-center text-[15px] font-bold text-gold">
+            {conquestSolved(q)
+              ? t.conquestClaimedBy(
+                  formatNumber(q.bounty, lang),
+                  authorLabel(q.champions[0]?.author ?? ""),
+                )
+              : t.conquestRewardXp(formatNumber(q.bounty, lang))}
+          </div>
+        </>
       ) : (
         <>
-          <div className="flex items-baseline justify-between border-t border-dashed border-cardline pt-2 text-[19px]">
-            <span>{t.record}</span>
-            <b className="text-[24px]">{q.record}</b>
+          <div className="border-t border-dashed border-cardline pt-3 text-center">
+            <div className="font-display text-[11px] tracking-[3px] text-ink-soft">{t.record}</div>
+            <div className="font-display text-[44px] font-black leading-none text-ink">
+              {q.record}
+            </div>
           </div>
-          <div className="mt-2 mb-1 h-3 border border-divider bg-bar-track">
+          <div className="mt-3 mb-1.5 h-2.5 border border-divider bg-bar-track">
             <div
               className="h-full"
               style={{
@@ -96,22 +104,26 @@ function MissionCard({ q }: { q: Mission }) {
               }}
             />
           </div>
-          {q.literatureBroken ? (
-            <div className="text-[16px] font-bold text-gold">{t.literatureRecordBroken}</div>
-          ) : (
-            <div className="text-[16px] text-ink-muted">
-              {t.towardLiterature(q.pct, q.literature)}
-            </div>
-          )}
-          <div className="mt-3 text-center text-[17px] font-bold text-gold">
+          <div className="text-center text-[13px] text-ink-soft">
+            {q.literatureBroken ? (
+              <span className="font-bold text-gold">{t.literatureRecordBroken}</span>
+            ) : (
+              t.towardLiterature(q.pct, q.literature)
+            )}
+          </div>
+          <div className="mt-2.5 text-center text-[15px] font-bold text-gold">
             {t.bountyXp(formatNumber(q.bounty, lang))}
           </div>
-          {!q.literatureBroken && (
-            <div className="mt-1 text-center text-[13px] text-ink-soft">
-              {t.literatureBonusHint(formatNumber(LITERATURE_BREAKTHROUGH_XP, lang))}
-            </div>
-          )}
         </>
+      )}
+      {q.proposedBy && (
+        <div
+          className="mt-auto flex items-center justify-end gap-1.5 pt-3 text-[12px] text-ink-soft"
+          title={t.proposedByLabel(authorLabel(q.proposedBy))}
+        >
+          <GithubAvatar author={q.proposedBy} size={14} border="#b89a63" />
+          <span>{t.proposedByLabel(authorLabel(q.proposedBy))}</span>
+        </div>
       )}
     </Link>
   );
@@ -119,7 +131,7 @@ function MissionCard({ q }: { q: Mission }) {
 
 function ProposeMissionCard() {
   const { tick, chime } = useSound();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   return (
     <a
       href={`${REPO_URL}/blob/main/CONTRIBUTING.md`}
@@ -136,7 +148,10 @@ function ProposeMissionCard() {
       <div className="text-[32px]">✒️</div>
       <h3 className="font-display text-[19px] font-bold text-ink">{t.proposeMissionTitle}</h3>
       <p className="text-[15px] text-ink-muted">{t.proposeMissionHint}</p>
-      <span className="mt-1 text-[14px] text-crimson underline underline-offset-2">
+      <div className="mt-1 text-[15px] font-bold text-gold">
+        {t.proposalRewardXp(formatNumber(MISSION_PROPOSAL_XP, lang))}
+      </div>
+      <span className="text-[14px] text-crimson underline underline-offset-2">
         {t.proposeMissionCta} ↗
       </span>
     </a>
@@ -171,7 +186,7 @@ function AdventurerScroll() {
     <div className="relative mx-auto mt-[30px] max-w-[640px]">
       {/* parchment: clipped from the right, revealed as the roller travels */}
       <div
-        className="scroll-paper px-10 py-6 pb-[52px] text-left transition-[clip-path] duration-[900ms] ease-out motion-reduce:transition-none"
+        className="scroll-paper px-10 py-6 pb-[52px] text-left transition-[clip-path] duration-[900ms] ease-out motion-reduce:transition-none max-md:px-6"
         style={{ clipPath: open ? "inset(-24px 0 -24px 0)" : "inset(-24px 100% -24px 0)" }}
       >
         <p className="font-body text-[18px] leading-[1.6] text-ink-body">
@@ -239,10 +254,10 @@ export default function MissionBoard() {
 
           {/* mission cards */}
           <div className="grid grid-cols-3 gap-[22px] max-md:grid-cols-1 max-md:gap-7">
+            <ProposeMissionCard />
             {missions.map((q) => (
               <MissionCard key={q.id} q={q} />
             ))}
-            <ProposeMissionCard />
           </div>
         </Sheet>
         <Footer />

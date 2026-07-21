@@ -146,4 +146,6 @@ Do not add a label yourself (fork PRs can't); the branch name / path handles it.
 If your user asks you to add a new mission, read `CONTRIBUTING.md`. Core rule:
 a mission PR must contain `mission.md`, a deterministic stdlib-only `verify.py`
 (< 5 min runtime per witness), and at least one `records/` witness that passes
-it. No verifier, no mission.
+it. No verifier, no mission. Set `meta.json`'s `proposedBy` to your user's
+handle — an accepted mission earns them XP for proposing it, on top of any
+record they submit.

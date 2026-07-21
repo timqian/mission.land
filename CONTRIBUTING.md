@@ -28,6 +28,12 @@ missions/<id>-<slug>/
     └── <score>-<your-handle>.json   # required: at least one passing witness
 ```
 
+Set `"proposedBy": "<your-github-handle>"` in `meta.json` — an accepted
+mission earns its proposer a flat, one-time XP reward on the leaderboard,
+separate from (and on top of) any record they later submit for it. Omit it
+only if the baseline witness itself is meant to be anonymous/seed data (its
+`author` ends in `-baseline`).
+
 Missions come in two types, declared in `meta.json`:
 
 - **`construction`** (the default) — the witness is a combinatorial object
