@@ -25,6 +25,12 @@ on:
 permissions:
   contents: read
 
+# Cancel a PR's older in-progress runs when it's pushed again; let main runs
+# finish (a merge should always re-verify to completion).
+concurrency:
+  group: verify-lean-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   verify:
     # Skip draft PRs — attempt logs shouldn't spin up the heavy Lean toolchain
@@ -34,6 +40,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need history to diff a PR against its base
 
       - name: Install elan
         run: |
@@ -53,17 +61,72 @@ jobs:
           path: ~/.cache/mission-land/comparator
           key: comparator-${{ hashFiles('tools/lean/comparator.lock') }}
 
+      # The dominant cost isn't the proof — even the trivial √2 mission imports
+      # Mathlib, so `lake exe cache get` re-fetches the whole Mathlib olean set on
+      # every run unless the build dirs survive. Key by each mission's pinned
+      # mathlib rev (lake-manifest) + toolchain; restore-keys warms from the last
+      # cache so a cold key only fetches the delta. Scoping PRs to the changed
+      # mission (below) keeps what lands on disk — and thus the cache — bounded.
+      - name: Cache Mathlib build (oleans)
+        uses: actions/cache@v4
+        with:
+          path: |
+            missions/*/challenge/.lake
+            ~/.cache/mathlib
+          key: lean-lake-${{ hashFiles('missions/*/challenge/lake-manifest.json', 'missions/*/challenge/lean-toolchain') }}
+          restore-keys: |
+            lean-lake-
+
       - name: Install landrun (sandbox; best effort)
         run: |
           go install github.com/Zouuup/landrun@main \
             && echo "$HOME/go/bin" >> "$GITHUB_PATH" \
             || echo "::warning::landrun install failed — solutions build unsandboxed in this ephemeral runner"
 
-      - name: Verify all proof-mission records
+      # On a PR, verify only the proof mission(s) whose files changed — a PR
+      # touching mission 4 shouldn't rebuild 5/6/7. Shared tooling (tools/lean,
+      # this workflow) or a push to main re-verifies every proof mission.
+      - name: Select proof missions to verify
+        id: select
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          list_all() {
+            for d in missions/*/; do
+              [ -f "${d}challenge/comparator-config.json" ] && printf '%s\n' "$d"
+            done
+          }
+          if [ "$EVENT" = "pull_request" ]; then
+            changed="$(git diff --name-only "$BASE" "$HEAD" || true)"
+            if printf '%s\n' "$changed" | grep -qE '^(tools/lean/|\.github/workflows/verify-lean\.yml)'; then
+              sel="$(list_all)"
+            else
+              sel=""
+              for d in $(printf '%s\n' "$changed" | grep -oE '^missions/[^/]+/' | sort -u || true); do
+                [ -f "${d}challenge/comparator-config.json" ] && sel="${sel}${d}"$'\n'
+              done
+            fi
+          else
+            sel="$(list_all)"
+          fi
+          {
+            echo "missions<<EOF"
+            printf '%s\n' "$sel"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          echo "Selected proof missions:"; printf '%s\n' "$sel"
+
+      - name: Verify selected proof-mission records
+        env:
+          MISSIONS: ${{ steps.select.outputs.missions }}
         run: |
           set -euo pipefail
           found=0
-          for d in missions/*/; do
+          while IFS= read -r d; do
+            [ -n "$d" ] || continue
             [ -f "${d}challenge/comparator-config.json" ] || continue
             for r in "${d}"records/*.json; do
               found=1
@@ -71,5 +134,5 @@ jobs:
               python3 "${d}verify.py" "$r"
               echo "::endgroup::"
             done
-          done
-          [ "$found" = "1" ] || echo "no proof missions found"
+          done <<< "$MISSIONS"
+          [ "$found" = "1" ] || echo "no proof missions to verify"
