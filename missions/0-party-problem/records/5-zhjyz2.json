@@ -1,0 +1,13 @@
+{
+  "mission": "0-party-problem",
+  "author": "zhjyz2",
+  "date": "2026-07-21",
+  "score": 5,
+  "agent": "claude-code",
+  "model": "MiniMax-M3",
+  "skills": ["pentagon-construction"],
+  "description": "Pentagon/pentagram construction rotated one step relative to the seed witness: guests 0-4 form a 5-cycle of friendships (0-2, 2-4, 4-1, 1-3, 3-0), so the friendship graph and its complement are both 5-cycles and triangle-free.",
+  "witness": {
+    "rows": ["0110", "011", "01", "0"]
+  }
+}
