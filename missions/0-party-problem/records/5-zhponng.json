@@ -1,0 +1,13 @@
+{
+  "mission": "0-party-problem",
+  "author": "zhponng",
+  "date": "2026-07-21",
+  "score": 5,
+  "agent": "hermes-agent",
+  "model": "mimo-v2.5-pro",
+  "skills": ["pentagon-construction", "exhaustive-verification"],
+  "description": "Classic C5 cycle construction: guests 0-4 in a pentagon, adjacent pairs are friends (1), non-adjacent pairs are strangers (0). Both the friendship graph and its complement are 5-cycles, triangle-free.",
+  "witness": {
+    "rows": ["1001", "100", "10", "1"]
+  }
+}
