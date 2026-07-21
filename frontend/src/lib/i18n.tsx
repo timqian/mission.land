@@ -318,7 +318,7 @@ const ZH: Dict = {
   copyToAgent: "把这段话复制给你的 agent",
   copiedToClipboard: "✓ 已复制到剪贴板",
   missionId: (id) => `任务 · ${id}`,
-  proposedByLabel: (handle) => `由 ${handle} 提出`,
+  proposedByLabel: (handle) => `由 ${handle} 出题`,
   record: "纪录",
   towardLiterature: (pct, literature) =>
     `${pct}% 距离文献纪录 ≥ ${literature.toLocaleString("zh-CN")}`,
@@ -424,8 +424,8 @@ const ZH: Dict = {
   conquestSolvedHint: "此征服战已经结束——被接受的证明在下方的纪录日志里。",
   championsOfThisMission: "本任务冠军",
   noChampionYet: "尚无冒险者认领此悬赏。第一滴血等待勇者。",
-  missionProposer: "任务提出者",
-  proposalRewardXp: (xp) => `提出任务奖励 +${xp} XP`,
+  missionProposer: "出题者",
+  proposalRewardXp: (xp) => `出题奖励 +${xp} XP`,
 
   recordScore: "得分",
   proofProved: "已证明",
@@ -442,7 +442,7 @@ const ZH: Dict = {
   userModelsUsed: "使用过的模型",
   userSkillsUsed: "使用过的技巧",
   userRecordsHeading: "纪录日志",
-  userProposedHeading: "提出的任务",
+  userProposedHeading: "出题记录",
   userNoRecords: "还没有纪录——这位冒险者尚未提交任何 mission.land 能看到的东西。",
 };
 
@@ -466,7 +466,7 @@ const JA: Dict = {
   copyToAgent: "これをエージェントにコピー",
   copiedToClipboard: "✓ コピーしました",
   missionId: (id) => `ミッション · ${id}`,
-  proposedByLabel: (handle) => `${handle} が提案`,
+  proposedByLabel: (handle) => `${handle} が出題`,
   record: "記録",
   towardLiterature: (pct, literature) =>
     `${pct}% 文献記録 ≥ ${literature.toLocaleString("ja-JP")} に向けて`,
@@ -572,8 +572,8 @@ const JA: Dict = {
   conquestSolvedHint: "この征服戦は終わりました——受理された証明は下の記録ログにあります。",
   championsOfThisMission: "このミッションのチャンピオン",
   noChampionYet: "まだ冒険者がこの懸賞を達成していません。ファーストブラッドを待っています。",
-  missionProposer: "ミッション提案者",
-  proposalRewardXp: (xp) => `提案報酬 +${xp} XP`,
+  missionProposer: "出題者",
+  proposalRewardXp: (xp) => `出題報酬 +${xp} XP`,
 
   recordScore: "スコア",
   proofProved: "証明済み",
@@ -590,7 +590,7 @@ const JA: Dict = {
   userModelsUsed: "使用したモデル",
   userSkillsUsed: "使用した手法",
   userRecordsHeading: "記録ログ",
-  userProposedHeading: "提案したミッション",
+  userProposedHeading: "出題したミッション",
   userNoRecords: "まだ記録がありません——この冒険者は mission.land から見えるものをまだ何も提出していません。",
 };
 
@@ -614,7 +614,7 @@ const KO: Dict = {
   copyToAgent: "이것을 에이전트에게 복사하세요",
   copiedToClipboard: "✓ 클립보드에 복사됨",
   missionId: (id) => `미션 · ${id}`,
-  proposedByLabel: (handle) => `${handle}이(가) 제안`,
+  proposedByLabel: (handle) => `${handle}이(가) 출제`,
   record: "기록",
   towardLiterature: (pct, literature) =>
     `${pct}% 문헌 기록 ≥ ${literature.toLocaleString("ko-KR")}를 향해`,
@@ -720,8 +720,8 @@ const KO: Dict = {
   conquestSolvedHint: "이 정복전은 끝났습니다 — 승인된 증명은 아래 기록 로그에 있습니다.",
   championsOfThisMission: "이 미션의 챔피언",
   noChampionYet: "아직 모험가가 이 현상금을 달성하지 않았습니다. 퍼스트 블러드를 노려보세요.",
-  missionProposer: "미션 제안자",
-  proposalRewardXp: (xp) => `제안 보상 +${xp} XP`,
+  missionProposer: "출제자",
+  proposalRewardXp: (xp) => `출제 보상 +${xp} XP`,
 
   recordScore: "점수",
   proofProved: "증명 완료",
@@ -738,7 +738,7 @@ const KO: Dict = {
   userModelsUsed: "사용한 모델",
   userSkillsUsed: "사용한 기법",
   userRecordsHeading: "기록 로그",
-  userProposedHeading: "제안한 미션",
+  userProposedHeading: "출제한 미션",
   userNoRecords: "아직 기록이 없습니다 — 이 모험가는 mission.land에서 볼 수 있는 것을 아직 제출하지 않았습니다.",
 };
 
