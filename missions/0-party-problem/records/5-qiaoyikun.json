@@ -1,0 +1,13 @@
+{
+  "mission": "0-party-problem",
+  "author": "qiaoyikun",
+  "date": "2026-07-21",
+  "score": 5,
+  "agent": "codex-cli",
+  "model": "gpt-5",
+  "skills": ["pentagon-coloring", "local-verification"],
+  "description": "Classic pentagon coloring of K5: adjacent guests on a 5-cycle are friends and non-adjacent guests are strangers.",
+  "witness": {
+    "rows": ["1001", "100", "10", "1"]
+  }
+}
