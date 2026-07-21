@@ -1,0 +1,41 @@
+name: verify
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  scope:
+    # Runs on drafts too — a branch that stacks commits for more than one
+    # mission is wrong regardless of draft state (see skill.md: "One PR = one
+    # mission = one record"). Only meaningful for pull_request; a push to
+    # main has no base to diff against.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check PR is scoped to one mission
+        run: |
+          python3 tools/check_pr_scope.py \
+            "${{ github.event.pull_request.base.sha }}" \
+            "${{ github.event.pull_request.head.sha }}"
+
+  verify:
+    # Skip draft PRs — they're attempt logs, not submissions to verify (see
+    # skill.md). Pushes to main always run.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify all records
+        run: python3 tools/verify_all.py
