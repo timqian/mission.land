@@ -630,6 +630,14 @@ export function userPath(author: string): string {
   return `/u/${encodeURIComponent(author)}`;
 }
 
+/** The three shareable leaderboard views. "overall" lives at the bare
+ *  /leaderboard; the focused boards get their own sub-path. */
+export type BoardKey = "overall" | "solvers" | "proposers";
+
+export function leaderboardPath(board: BoardKey): string {
+  return board === "overall" ? "/leaderboard" : `/leaderboard/${board}`;
+}
+
 /** A conquest mission is solved once any record scores above the 0-score
  *  sanity baseline — the documented convention (see CONTRIBUTING.md) is that
  *  the sanity theorem always scores 0 and any real proof/disproof scores > 0. */

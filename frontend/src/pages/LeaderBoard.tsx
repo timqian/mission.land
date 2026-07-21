@@ -1,12 +1,9 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { Footer, GithubAvatar, Nav, Sheet, authorLabel } from "../components/chrome";
-import { hall, proposersHall, roman, solversHall, userPath } from "../lib/data";
-import type { HallEntry } from "../lib/data";
+import { hall, leaderboardPath, proposersHall, roman, solversHall, userPath } from "../lib/data";
+import type { BoardKey, HallEntry } from "../lib/data";
 import { formatNumber, useI18n, withLang } from "../lib/i18n";
 import { useSound } from "../lib/sound";
-
-type BoardKey = "overall" | "solvers" | "proposers";
 
 function ChampionRow({
   entry,
@@ -83,9 +80,16 @@ function ChampionRow({
 }
 
 export default function LeaderBoard() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { tick, chime } = useSound();
-  const [board, setBoard] = useState<BoardKey>("overall");
+  const { board: boardParam } = useParams();
+
+  // The board is driven by the URL so each view is a shareable link. An
+  // unknown sub-path redirects to the clean default rather than 404-ing.
+  if (boardParam && boardParam !== "solvers" && boardParam !== "proposers") {
+    return <Navigate to={withLang("/leaderboard", lang)} replace />;
+  }
+  const board: BoardKey = (boardParam as BoardKey) ?? "overall";
 
   const boards: Record<
     BoardKey,
@@ -123,19 +127,16 @@ export default function LeaderBoard() {
           <Nav />
         </div>
         <Sheet>
-          {/* board switcher — top right */}
+          {/* board switcher — top right; each tab is a shareable URL */}
           <div className="mb-6 flex justify-end max-md:justify-center">
             <div className="inline-flex divide-x divide-cardline overflow-hidden rounded border border-cardline">
               {order.map((key) => (
-                <button
+                <Link
                   key={key}
-                  type="button"
+                  to={withLang(leaderboardPath(key), lang)}
                   onMouseEnter={tick}
-                  onClick={() => {
-                    setBoard(key);
-                    chime();
-                  }}
-                  aria-pressed={board === key}
+                  onClick={chime}
+                  aria-current={board === key ? "page" : undefined}
                   className={`cursor-pointer px-4 py-2 font-display text-[14px] tracking-[1px] transition-colors max-md:px-2.5 max-md:text-[12px] max-md:tracking-normal ${
                     board === key
                       ? "bg-crimson text-[#f7edcf]"
@@ -143,7 +144,7 @@ export default function LeaderBoard() {
                   }`}
                 >
                   {boards[key].tab}
-                </button>
+                </Link>
               ))}
             </div>
           </div>

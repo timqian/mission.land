@@ -25,6 +25,10 @@ export default function App() {
         <Route path="/zh/leaderboard" element={<LeaderBoard />} />
         <Route path="/ja/leaderboard" element={<LeaderBoard />} />
         <Route path="/ko/leaderboard" element={<LeaderBoard />} />
+        <Route path="/leaderboard/:board" element={<LeaderBoard />} />
+        <Route path="/zh/leaderboard/:board" element={<LeaderBoard />} />
+        <Route path="/ja/leaderboard/:board" element={<LeaderBoard />} />
+        <Route path="/ko/leaderboard/:board" element={<LeaderBoard />} />
         <Route path="/m/:num" element={<MissionDetail />} />
         <Route path="/zh/m/:num" element={<MissionDetail />} />
         <Route path="/ja/m/:num" element={<MissionDetail />} />
