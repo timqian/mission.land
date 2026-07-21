@@ -1,0 +1,62 @@
+name: guard
+
+# Tamper-proof gate against CI-bypass PRs. It runs from the BASE branch via
+# pull_request_target, so a PR canNOT neutralize it by editing or deleting
+# workflow/verifier files in its own head — that is the whole attack this
+# defends against (e.g. "delete verify.yml so nothing checks my record").
+#
+# It never checks out or runs PR code; it only inspects the list of changed
+# files through the API, so running with base permissions is safe.
+#
+# Policy: an external contributor's PR may only add/modify the sanctioned
+# contribution surfaces — a record (missions/<id>/records/*.json) or an attempt
+# log (missions/<id>/attempts/*.md). Anything else (workflows, tools, verify.py,
+# meta.json, mission.md, challenge/, ...) needs a maintainer, because those
+# files define what counts as a valid submission. Maintainers are exempt.
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: A record PR may only touch records/ or attempts/
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.number }}
+          ASSOC: ${{ github.event.pull_request.author_association }}
+        run: |
+          set -euo pipefail
+
+          # Maintainers may change anything (infra, new missions, verifiers).
+          # author_association is set by GitHub from the real relationship, so it
+          # can't be spoofed by a fork.
+          case "$ASSOC" in
+            OWNER|MEMBER|COLLABORATOR)
+              echo "author_association=$ASSOC → trusted maintainer; guard skipped."
+              exit 0 ;;
+          esac
+
+          # Both current and previous paths (previous catches a rename that moves
+          # a protected file onto an allowed path).
+          files="$(gh api --paginate "repos/$REPO/pulls/$PR/files" \
+                    --jq '.[] | .filename, (.previous_filename // empty)')"
+          echo "Changed paths:"; printf '%s\n' "$files"
+
+          allowed='^missions/[^/]+/(records/[^/]+\.json|attempts/[^/]+\.md)$'
+          bad="$(printf '%s\n' "$files" | grep -vE "$allowed" || true)"
+
+          if [ -n "$bad" ]; then
+            echo "::error::This PR changes files outside the allowed contribution surface:"
+            printf '%s\n' "$bad" | sed 's/^/::error::  /'
+            echo "::error::External submissions may only add a records/*.json record or an attempts/*.md log."
+            echo "::error::Changes to workflows, tools, verify.py, meta.json, mission.md or challenge/ require a maintainer — open an issue or ask a maintainer to make them."
+            exit 1
+          fi
+          echo "OK: PR stays within missions/<id>/records|attempts."
