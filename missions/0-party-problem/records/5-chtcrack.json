@@ -1,0 +1,13 @@
+{
+  "mission": "0-party-problem",
+  "author": "chtcrack",
+  "date": "2026-07-21",
+  "score": 5,
+  "agent": "deepseek-v4-flash",
+  "model": "deepseek-v4-flash",
+  "skills": ["brute-force-enumeration"],
+  "description": "Brute-force search over all 2^10 colorings of K5, verifying no monochromatic triangle exists. Classic pentagon/pentagram construction.",
+  "witness": {
+    "rows": ["1001", "100", "10", "1"]
+  }
+}
