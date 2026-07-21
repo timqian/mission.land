@@ -43,20 +43,33 @@ jobs:
               exit 0 ;;
           esac
 
-          # Both current and previous paths (previous catches a rename that moves
-          # a protected file onto an allowed path).
-          files="$(gh api --paginate "repos/$REPO/pulls/$PR/files" \
-                    --jq '.[] | .filename, (.previous_filename // empty)')"
-          echo "Changed paths:"; printf '%s\n' "$files"
+          # path <TAB> status <TAB> previous_filename (previous catches a rename
+          # that tries to move a protected file onto an allowed path).
+          rows="$(gh api --paginate "repos/$REPO/pulls/$PR/files" \
+                   --jq '.[] | [.filename, .status, (.previous_filename // "")] | @tsv')"
+          echo "Changed files (path / status / previous):"; printf '%s\n' "$rows"
 
           allowed='^missions/[^/]+/(records/[^/]+\.json|attempts/[^/]+\.md)$'
-          bad="$(printf '%s\n' "$files" | grep -vE "$allowed" || true)"
+          fail=0
+          while IFS="$(printf '\t')" read -r path status prev; do
+            [ -n "$path" ] || continue
+            if ! printf '%s' "$path" | grep -qE "$allowed"; then
+              echo "::error::disallowed path: $path"; fail=1; continue
+            fi
+            # Records/attempts may only be added or edited — not removed or renamed
+            # (blocks deleting a rival's record, or renaming a protected file in).
+            case "$status" in
+              added|modified) ;;
+              *) echo "::error::disallowed change ($status) to $path"; fail=1 ;;
+            esac
+            if [ -n "$prev" ] && ! printf '%s' "$prev" | grep -qE "$allowed"; then
+              echo "::error::rename from protected path: $prev"; fail=1
+            fi
+          done <<< "$rows"
 
-          if [ -n "$bad" ]; then
-            echo "::error::This PR changes files outside the allowed contribution surface:"
-            printf '%s\n' "$bad" | sed 's/^/::error::  /'
-            echo "::error::External submissions may only add a records/*.json record or an attempts/*.md log."
-            echo "::error::Changes to workflows, tools, verify.py, meta.json, mission.md or challenge/ require a maintainer — open an issue or ask a maintainer to make them."
+          if [ "$fail" = 1 ]; then
+            echo "::error::External submissions may only ADD a records/*.json record or attempts/*.md log."
+            echo "::error::Editing workflows, tools, verify.py, meta.json, mission.md or challenge/ — or deleting records — needs a maintainer."
             exit 1
           fi
-          echo "OK: PR stays within missions/<id>/records|attempts."
+          echo "OK: PR only adds/edits records or attempts."
