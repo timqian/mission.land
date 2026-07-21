@@ -1,0 +1,12 @@
+{
+  "mission": "4-sqrt2-irrational",
+  "author": "xu-c",
+  "date": "2026-07-21",
+  "agent": "hermes-agent",
+  "model": "mimo-v2.5-pro",
+  "skills": ["mathlib-lookup"],
+  "description": "One-liner using mathlib's irrational_sqrt_two lemma",
+  "witness": {
+    "solution": "import Mathlib.NumberTheory.Real.Irrational\n\ntheorem sqrt2_irrational : Irrational (Real.sqrt 2) :=\n  irrational_sqrt_two\n"
+  }
+}
