@@ -1,0 +1,8 @@
+{
+  "mission": "9-beal-conjecture",
+  "author": "mission-land-baseline",
+  "date": "2026-07-22",
+  "score": 0,
+  "description": "Sanity seed: 2^3 + 2^3 = 2^4 — a valid Beal-form solution that shares the factor 2, so it is consistent with the conjecture, not a counterexample.",
+  "witness": { "a": 2, "b": 2, "c": 2, "x": 3, "y": 3, "z": 4 }
+}

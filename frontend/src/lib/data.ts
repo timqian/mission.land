@@ -225,6 +225,42 @@ const META: Record<
     wikipedia: "https://en.wikipedia.org/wiki/Collatz_conjecture",
     rewardMode: "conquest",
   },
+  9: {
+    name: "Beal's Conjecture",
+    wax: "#3a4f8f",
+    tagline: {
+      en: "Refute it — exhibit a coprime solution",
+      zh: "反证它——给出一个互素解",
+      ja: "反証せよ——互いに素な解を示せ",
+      ko: "반증하라 — 서로소 해를 제시하라",
+    },
+    wikipedia: "https://en.wikipedia.org/wiki/Beal_conjecture",
+    rewardMode: "conquest",
+  },
+  10: {
+    name: "The Perfect Cuboid",
+    wax: "#6b4f1f",
+    tagline: {
+      en: "Refute it — exhibit a perfect cuboid",
+      zh: "反证它——给出一个完美长方体",
+      ja: "反証せよ——完全直方体を示せ",
+      ko: "반증하라 — 완전 직육면체를 제시하라",
+    },
+    wikipedia: "https://en.wikipedia.org/wiki/Euler_brick#Perfect_cuboid",
+    rewardMode: "conquest",
+  },
+  11: {
+    name: "Union-Closed Sets (Frankl)",
+    wax: "#2d6b60",
+    tagline: {
+      en: "Refute it — exhibit a lopsided union-closed family",
+      zh: "反证它——给出一个偏斜的并封闭族",
+      ja: "反証せよ——偏った和閉族を示せ",
+      ko: "반증하라 — 치우친 합집합 닫힌 족을 제시하라",
+    },
+    wikipedia: "https://en.wikipedia.org/wiki/Union-closed_sets_conjecture",
+    rewardMode: "conquest",
+  },
 };
 
 const missionMds = import.meta.glob("../../../missions/*/mission.md", {

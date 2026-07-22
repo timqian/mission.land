@@ -1,0 +1,8 @@
+{
+  "mission": "11-union-closed-sets",
+  "author": "mission-land-baseline",
+  "date": "2026-07-22",
+  "score": 0,
+  "description": "Sanity seed: the union-closed family { {}, {1} }. Element 1 is in half the sets, so Frankl's condition holds — not a counterexample.",
+  "witness": { "sets": [[], [1]] }
+}
