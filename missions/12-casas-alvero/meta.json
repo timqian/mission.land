@@ -1,6 +1,8 @@
 {
-  "type": "counterexample",
+  "type": "conjecture",
   "verify": "python3 verify.py",
-  "tools": ["python>=3.10"],
+  "tools": [
+    "python>=3.10"
+  ],
   "proposedBy": "timqian"
 }

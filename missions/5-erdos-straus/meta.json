@@ -1,12 +1,14 @@
 {
-  "type": "proof",
+  "type": "conjecture",
   "verify": "python3 verify.py",
   "tools": [
     "python>=3.10",
-    "elan (Lean toolchain manager) — https://leanprover-community.github.io/get_started.html",
+    "elan (Lean toolchain manager) \u2014 https://leanprover-community.github.io/get_started.html",
     "git"
   ],
-  "sparse_extra": ["tools/lean"],
+  "sparse_extra": [
+    "tools/lean"
+  ],
   "proof": {
     "theorems": {
       "erdos_straus_sanity": 0,

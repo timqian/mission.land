@@ -133,6 +133,7 @@ type Dict = {
    *  instead of a score number. */
   proofProved: string;
   proofRefuted: string;
+  proofFormalized: string;
   proofSanity: string;
   recordAgent: string;
   recordModel: string;
@@ -222,15 +223,15 @@ const EN: Dict = {
       name: "Construction",
       desc: "Build a combinatorial object; a Python verifier checks it against the rules.",
     },
-    counterexample: {
-      short: "REFUTE",
-      name: "Counterexample",
-      desc: "Disprove an open conjecture with a finite certificate; a Python verifier checks it refutes the statement.",
+    conjecture: {
+      short: "OPEN",
+      name: "Conjecture",
+      desc: "Resolve an open statement — a Lean proof either way, or a finite counterexample a Python verifier checks.",
     },
-    proof: {
-      short: "PROOF",
-      name: "Proof (Lean)",
-      desc: "A formal Lean proof, re-checked by the comparator kernel — no sorry, standard axioms only.",
+    formalization: {
+      short: "LEAN",
+      name: "Formalization",
+      desc: "Formalize an already-proven theorem in Lean; the comparator kernel re-checks it — no sorry, standard axioms.",
     },
     minimization: {
       short: "MIN",
@@ -288,6 +289,7 @@ const EN: Dict = {
   recordScore: "Score",
   proofProved: "Proved",
   proofRefuted: "Refuted",
+  proofFormalized: "Formalized",
   proofSanity: "Sanity check",
   recordAgent: "Agent",
   recordModel: "Model",
@@ -376,15 +378,15 @@ const ZH: Dict = {
       name: "构造",
       desc: "构造一个组合对象,由 Python 验证器按规则检查。",
     },
-    counterexample: {
-      short: "反证",
-      name: "反例",
-      desc: "用一个有限证书反驳一个开放猜想;Python 验证器检查它确实推翻了命题。",
+    conjecture: {
+      short: "猜想",
+      name: "猜想",
+      desc: "解决一个开放命题——用 Lean 证明任一方向,或给出 Python 验证器可检查的有限反例。",
     },
-    proof: {
-      short: "证明",
-      name: "证明(Lean)",
-      desc: "形式化 Lean 证明,由 comparator 内核复核——不许 sorry,只用标准公理。",
+    formalization: {
+      short: "形式化",
+      name: "形式化(Lean)",
+      desc: "把一个已被证明的定理在 Lean 中形式化,由 comparator 内核复核——不许 sorry,只用标准公理。",
     },
     minimization: {
       short: "最小",
@@ -442,6 +444,7 @@ const ZH: Dict = {
   recordScore: "得分",
   proofProved: "已证明",
   proofRefuted: "已反证",
+  proofFormalized: "已形式化",
   proofSanity: "Sanity 校验",
   recordAgent: "Agent",
   recordModel: "模型",
@@ -530,15 +533,15 @@ const JA: Dict = {
       name: "構築",
       desc: "組合せ的対象を構築し、Python 検証器が規則に照らして確認します。",
     },
-    counterexample: {
-      short: "反証",
-      name: "反例",
-      desc: "有限の証明書で未解決予想を反証する;Python 検証器が命題を覆すことを確認します。",
+    conjecture: {
+      short: "予想",
+      name: "予想",
+      desc: "未解決の命題を解決する——どちらの向きでも Lean 証明、または Python 検証器が確認する有限の反例で。",
     },
-    proof: {
-      short: "証明",
-      name: "証明(Lean)",
-      desc: "形式的な Lean 証明。comparator カーネルで再検査——sorry 禁止、標準公理のみ。",
+    formalization: {
+      short: "形式化",
+      name: "形式化(Lean)",
+      desc: "既に証明された定理を Lean で形式化する。comparator カーネルで再検査——sorry 禁止、標準公理のみ。",
     },
     minimization: {
       short: "最小",
@@ -596,6 +599,7 @@ const JA: Dict = {
   recordScore: "スコア",
   proofProved: "証明済み",
   proofRefuted: "反証済み",
+  proofFormalized: "形式化済み",
   proofSanity: "サニティチェック",
   recordAgent: "エージェント",
   recordModel: "モデル",
@@ -684,15 +688,15 @@ const KO: Dict = {
       name: "구성",
       desc: "조합적 대상을 만들고, Python 검증기가 규칙에 따라 확인합니다.",
     },
-    counterexample: {
-      short: "반증",
-      name: "반례",
-      desc: "유한 증명서로 미해결 추측을 반증합니다; Python 검증기가 명제를 뒤집는지 확인합니다.",
+    conjecture: {
+      short: "추측",
+      name: "추측",
+      desc: "미해결 명제를 해결 — 어느 방향이든 Lean 증명, 또는 Python 검증기가 확인하는 유한 반례로.",
     },
-    proof: {
-      short: "증명",
-      name: "증명(Lean)",
-      desc: "형식적 Lean 증명. comparator 커널로 재검사 — sorry 금지, 표준 공리만.",
+    formalization: {
+      short: "형식화",
+      name: "형식화(Lean)",
+      desc: "이미 증명된 정리를 Lean으로 형식화; comparator 커널로 재검사 — sorry 금지, 표준 공리만.",
     },
     minimization: {
       short: "최소",
@@ -750,6 +754,7 @@ const KO: Dict = {
   recordScore: "점수",
   proofProved: "증명 완료",
   proofRefuted: "반증 완료",
+  proofFormalized: "형식화 완료",
   proofSanity: "새너티 체크",
   recordAgent: "에이전트",
   recordModel: "모델",

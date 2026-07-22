@@ -130,7 +130,7 @@ export default function UserProfile() {
                     const m = missionByNum(r.missionNum);
                     const theorems = witnessTheorems(r.witness);
                     const status = recordStatus(r);
-                    const solved = status === "proved" || status === "refuted";
+                    const solved = status === "proved" || status === "refuted" || status === "formalized";
                     return (
                       <div
                         key={`${r.missionNum}-${r.score}-${r.date}`}
@@ -148,7 +148,9 @@ export default function UserProfile() {
                               ? `✓ ${t.proofProved}`
                               : status === "refuted"
                                 ? `✓ ${t.proofRefuted}`
-                                : t.proofSanity}
+                                : status === "formalized"
+                                  ? `✓ ${t.proofFormalized}`
+                                  : t.proofSanity}
                           </span>
                         ) : (
                           <span className="font-display text-[26px] font-black text-ink">

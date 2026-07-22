@@ -34,13 +34,14 @@ export type MissionRecord = {
   /** repo-seeded baseline, not an adventurer */
   seed: boolean;
   current: boolean;
-  /** Proof-mission record: `score` here is a boolean solved-flag, not a rank
-   *  (0 = the sanity baseline, > 0 = a real theorem proved), so the UI shows a
-   *  proved/sanity status instead of the number. Mirrors the mission's flag. */
-  isProof: boolean;
-  /** Counterexample-mission record: `score` is a solved-flag too (0 = sanity
-   *  seed, 1 = a witness that refutes the conjecture). Mirrors the mission. */
-  isCounterexample: boolean;
+  /** Conjecture/formalization record: `score` is a boolean solved-flag, not a
+   *  rank (0 = sanity seed, > 0 = resolved), so the UI shows a status word
+   *  (proved / refuted / formalized / seed) instead of the number. Mirrors the
+   *  mission's type + resolution kind below. */
+  typeKey: MissionTypeKey;
+  /** Resolved via a Lean proof (true) vs a finite witness the Python verifier
+   *  checks (false) — drives proved/formalized vs refuted wording. */
+  isLean: boolean;
   /** GitHub commit history for the witness file — one click from the merged PR */
   prUrl: string;
   agent?: string;
@@ -68,16 +69,14 @@ export type Mission = {
    *  sanity record scores 0, the first real proof scores 1 and takes the bounty),
    *  but displayed as an open challenge rather than a climbing bound. */
   rewardMode: "leaderboard" | "completion" | "conquest";
-  /** Lean proof mission (meta.json `type: "proof"`): a theorem is proved or not,
-   *  so there is no numeric bound to climb — the UI shows a proved/sanity status
-   *  rather than a score, even though `score` still drives XP internally. */
-  isProof: boolean;
-  /** meta.json `type: "counterexample"`: the witness is a finite certificate that
-   *  refutes an open conjecture; a stdlib verifier scores it 1 (refuted) / 0
-   *  (sanity seed). Displayed as a conquest, like an open proof mission. */
-  isCounterexample: boolean;
-  /** Which mission-type badge to show (construction / counterexample / proof). */
+  /** Which mission-type badge to show: construction (climb a bound), conjecture
+   *  (resolve an open statement — by Lean proof or finite counterexample), or
+   *  formalization (formalize an already-proven theorem in Lean). */
   typeKey: MissionTypeKey;
+  /** Verified via Lean (formalization missions, and conjecture missions whose
+   *  resolution path is a proof) vs a finite witness a Python verifier checks.
+   *  For conjecture/formalization missions `score` is a solved-flag, not a rank. */
+  isLean: boolean;
   literature: number;
   record: number;
   pct: number; // % of literature target claimed
@@ -109,7 +108,7 @@ export const DISCORD_URL = "https://discord.gg/6e5JXZxycu";
 /** Presentation metadata the md files don't carry. New missions get defaults. */
 const META: Record<
   string,
-  Partial<Pick<Mission, "wax" | "wikipedia" | "rewardMode" | "isProof">> & {
+  Partial<Pick<Mission, "wax" | "wikipedia" | "rewardMode">> & {
     /** English display name override; other languages derive from their own translated heading. */
     name?: string;
     /** Tagline per language; missing languages fall back to en, then the generic default. */
@@ -172,7 +171,6 @@ const META: Record<
     },
     wikipedia: "https://en.wikipedia.org/wiki/Square_root_of_2",
     rewardMode: "completion",
-    isProof: true,
   },
   5: {
     name: "Erdős–Straus Conjecture (Lean)",
@@ -185,7 +183,6 @@ const META: Record<
     },
     wikipedia: "https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93Straus_conjecture",
     rewardMode: "conquest",
-    isProof: true,
   },
   6: {
     name: "Van der Waerden's Theorem (Lean)",
@@ -198,7 +195,6 @@ const META: Record<
     },
     wikipedia: "https://en.wikipedia.org/wiki/Van_der_Waerden%27s_theorem",
     rewardMode: "conquest",
-    isProof: true,
   },
   7: {
     name: "Ramsey's Theorem (Lean)",
@@ -211,7 +207,6 @@ const META: Record<
     },
     wikipedia: "https://en.wikipedia.org/wiki/Ramsey%27s_theorem",
     rewardMode: "conquest",
-    isProof: true,
   },
   8: {
     name: "The Collatz Conjecture",
@@ -313,7 +308,7 @@ const recordJsons = import.meta.glob("../../../missions/*/records/*.json", {
 const metaJsons = import.meta.glob("../../../missions/*/meta.json", {
   import: "default",
   eager: true,
-}) as Record<string, { proposedBy?: string; type?: string }>;
+}) as Record<string, { proposedBy?: string; type?: string; tools?: string[] }>;
 
 const i18nMissionMds = import.meta.glob("../../../i18n/*/*.md", {
   query: "?raw",
@@ -380,9 +375,9 @@ function isSeed(author: string): boolean {
  *  solved-flag, not a rank). Proof convention: a record that proves only sanity
  *  theorems — named `*_sanity` in the challenge lock — scores 0; anything else
  *  (including single-mandatory proofs with no `theorems` list) scores 1. */
-function effectiveScore(r: RecordFile, isProof: boolean): number {
+function effectiveScore(r: RecordFile, solvedFlag: boolean): number {
   if (typeof r.score === "number") return r.score;
-  if (!isProof) return 0; // construction records always declare their score
+  if (!solvedFlag) return 0; // construction records always declare their score
   const claimed = witnessTheorems(r.witness);
   if (claimed && claimed.length > 0 && claimed.every((t) => t.endsWith("_sanity"))) return 0;
   return 1;
@@ -402,10 +397,10 @@ export const MISSION_PROPOSAL_XP = 5000;
  *  a tutorial/practice trial pays a token 100, a construction breakthrough pays
  *  5000, and cracking a proof mission pays 100000. Surpassing a literature
  *  record still adds the larger LITERATURE_BREAKTHROUGH_XP milestone on top. */
-function missionXp(isProof: boolean, rewardMode: Mission["rewardMode"]): number {
+function missionXp(rewardMode: Mission["rewardMode"]): number {
   if (rewardMode === "completion") return 100; // tutorial / practice
-  if (rewardMode === "conquest") return 100000; // crack an open problem (proof or counterexample)
-  return isProof ? 100000 : 5000; // proof vs construction breakthrough
+  if (rewardMode === "conquest") return 100000; // resolve an open problem or formalize a theorem
+  return 5000; // construction breakthrough (ranked leaderboard)
 }
 
 function buildMission(
@@ -414,6 +409,7 @@ function buildMission(
   entries: RecordEntry[],
   proposedBy: string | undefined,
   metaType: string | undefined,
+  metaTools: string[] | undefined,
 ): Mission {
   const files = entries.map((e) => e.file);
   const num = parseInt(slug.match(/^(\d+)/)?.[1] ?? "0", 10);
@@ -435,13 +431,25 @@ function buildMission(
   }
 
   // English sections are the source of truth for which blocks to surface and in
+  // Type + resolution kind. `type` comes from meta.json; a mission is Lean-
+  // verified when it declares a non-Python tool (elan) — that covers every
+  // formalization mission and the conjecture missions resolved by a proof.
+  const typeKey: MissionTypeKey =
+    metaType === "formalization"
+      ? "formalization"
+      : metaType === "conjecture"
+        ? "conjecture"
+        : "construction";
+  const isLean = (metaTools ?? []).some((t) => !t.startsWith("python"));
+  const solvedFlag = typeKey === "conjecture" || typeKey === "formalization";
+
   // what order; each localized file lines up by index (see parseSections).
-  // Proof missions have no rank to climb, so their "Score" section is just the
-  // solved-flag note — redundant as a standalone block, so drop it there.
+  // Solved-flag missions have no rank to climb, so their "Score" section is just
+  // the flag note — redundant as a standalone block, so drop it there.
   const guide = parseSections(md)
     .map((sec, i) => ({ sec, i }))
     .filter(({ sec }) => GUIDE_SECTIONS.has(sec.title))
-    .filter(({ sec }) => !(meta.isProof && sec.title === "Score"))
+    .filter(({ sec }) => !(solvedFlag && sec.title === "Score"))
     .map(({ i }) => {
       const title = {} as Record<Lang, string>;
       const html = {} as Record<Lang, string>;
@@ -458,14 +466,9 @@ function buildMission(
     10,
   );
 
-  const isProof = meta.isProof ?? false;
-  const isCounterexample = metaType === "counterexample";
-  const typeKey: MissionTypeKey = isCounterexample
-    ? "counterexample"
-    : isProof
-      ? "proof"
-      : "construction";
-  const scoreOf = (r: RecordFile) => effectiveScore(r, isProof);
+  // A solved-flag mission's score is derived from its theorems/witness (0 sanity
+  // seed / >0 resolved); construction records always carry an explicit score.
+  const scoreOf = (r: RecordFile) => effectiveScore(r, solvedFlag);
   // Primary order is score desc (the leaderboard rank). On a tie — which is the
   // whole story for completion missions, where every valid witness hits the same
   // fixed target — the seeded baseline always sinks to the bottom and the rest
@@ -485,8 +488,8 @@ function buildMission(
     date: r.date,
     seed: isSeed(r.author),
     current: i === 0,
-    isProof,
-    isCounterexample,
+    typeKey,
+    isLean,
     prUrl: `${REPO_URL}/blob/main/missions/${slug}/records/${filename}`,
     agent: r.agent,
     model: r.model,
@@ -496,7 +499,7 @@ function buildMission(
   }));
 
   const rewardMode = meta.rewardMode ?? "leaderboard";
-  const xpPerBreakthrough = missionXp(isProof, rewardMode);
+  const xpPerBreakthrough = missionXp(rewardMode);
 
   const xpBy = new Map<string, { xp: number; records: number }>();
   if (rewardMode === "completion") {
@@ -544,9 +547,8 @@ function buildMission(
     wax: meta.wax ?? "#8f2d2d",
     xpPerBreakthrough,
     rewardMode,
-    isProof,
-    isCounterexample,
     typeKey,
+    isLean,
     literature,
     record,
     pct: literature ? Math.round((record / literature) * 100) : 0,
@@ -575,7 +577,14 @@ export const missions: Mission[] = Object.entries(missionMds)
       .filter(([p]) => p.includes(`/${slug}/`))
       .map(([p, file]) => ({ file, filename: p.split("/").at(-1)! }));
     const metaEntry = Object.entries(metaJsons).find(([p]) => p.includes(`/${slug}/`));
-    return buildMission(slug, md, entries, metaEntry?.[1].proposedBy, metaEntry?.[1].type);
+    return buildMission(
+      slug,
+      md,
+      entries,
+      metaEntry?.[1].proposedBy,
+      metaEntry?.[1].type,
+      metaEntry?.[1].tools,
+    );
   })
   .sort((a, b) => a.num - b.num);
 
@@ -752,31 +761,24 @@ export function conquestSolved(q: Mission): boolean {
   return q.rewardMode === "conquest" && q.record > 0;
 }
 
-/** Proof-mission witnesses carry `witness.theorems`, naming which locked
- *  theorem(s) the record claims to prove — the score alone (0 or 1) can't
- *  distinguish, say, proving a conjecture from disproving it. */
-/** Solved-flag missions (proof and counterexample) carry a boolean in `score`,
+/** Solved-flag missions (conjecture, formalization) carry a boolean in `score`,
  *  not a rank, so the UI renders a status word instead of the number:
- *   - proof:          "proved" (score > 0) / "sanity" (score 0)
- *   - counterexample: "refuted" (score > 0) / "seed" (score 0)
- *  Ranked (construction) records return null — show their score as usual. */
+ *   - formalization:        "formalized" (>0) / "sanity" (0)
+ *   - conjecture, Lean:     "proved"     (>0) / "sanity" (0)
+ *   - conjecture, witness:  "refuted"    (>0) / "seed"   (0)
+ *  Ranked (construction) records return null — show their score as usual.
+ *  ("proved" and "refuted" both mean resolved — the wording just reflects how.) */
 export function recordStatus(r: {
-  isProof: boolean;
-  isCounterexample: boolean;
+  typeKey: MissionTypeKey;
+  isLean: boolean;
   score: number;
-}): "proved" | "sanity" | "refuted" | "seed" | null {
-  if (r.isProof) return r.score > 0 ? "proved" : "sanity";
-  if (r.isCounterexample) return r.score > 0 ? "refuted" : "seed";
+}): "proved" | "refuted" | "formalized" | "sanity" | "seed" | null {
+  if (r.typeKey === "formalization") return r.score > 0 ? "formalized" : "sanity";
+  if (r.typeKey === "conjecture") {
+    if (r.isLean) return r.score > 0 ? "proved" : "sanity";
+    return r.score > 0 ? "refuted" : "seed";
+  }
   return null;
-}
-
-/** @deprecated use recordStatus — kept as a thin alias for proof-only callers. */
-export function proofStatus(r: {
-  isProof: boolean;
-  isCounterexample?: boolean;
-  score: number;
-}): "proved" | "sanity" | "refuted" | "seed" | null {
-  return recordStatus({ isCounterexample: false, ...r });
 }
 
 /** The catalog of mission "types" — the shape of a challenge and how its
@@ -785,8 +787,8 @@ export function proofStatus(r: {
  *  live in i18n under `missionTypes[key]`; ordering here drives the modal. */
 export type MissionTypeKey =
   | "construction"
-  | "counterexample"
-  | "proof"
+  | "conjecture"
+  | "formalization"
   | "minimization"
   | "certificate"
   | "proof-golf"
@@ -802,8 +804,8 @@ export const MISSION_TYPES: {
   xp?: number;
 }[] = [
   { key: "construction", supported: true, accent: "#3a6b4f", xp: 5000 },
-  { key: "counterexample", supported: true, accent: "#7a2f6b", xp: 100000 },
-  { key: "proof", supported: true, accent: "#2d5a8f", xp: 100000 },
+  { key: "conjecture", supported: true, accent: "#7a2f6b", xp: 100000 },
+  { key: "formalization", supported: true, accent: "#2d5a8f", xp: 100000 },
   { key: "minimization", supported: false, accent: "#8f2d2d" },
   { key: "certificate", supported: false, accent: "#6b4f1f" },
   { key: "proof-golf", supported: false, accent: "#2d6b60" },
@@ -840,11 +842,14 @@ export function agentPrompt(q: Mission): string {
   }
   if (q.rewardMode === "conquest") {
     if (conquestSolved(q)) {
-      return `Read ${SKILL_URL}. Mission ${q.id} (${q.name.en}) has already been solved — it's a one-shot conquest, not a leaderboard, so there's no further reward there. Pick a different open mission from mission.land instead.`;
+      return `Read ${SKILL_URL}. Mission ${q.id} (${q.name.en}) has already been claimed — it's a one-shot conquest, not a leaderboard, so there's no further reward there. Pick a different open mission from mission.land instead.`;
     }
-    const how = q.isCounterexample
-      ? "find a counterexample that refutes it — a finite witness the Python verifier checks"
-      : "prove the locked statement in Lean";
+    if (q.typeKey === "formalization") {
+      return `Read ${SKILL_URL} and act as my mission.land agent: take mission ${q.id} (${q.name.en}), an established theorem not yet formalized — write the locked Lean proof, verify it locally, and submit it as a pull request under my GitHub account.`;
+    }
+    const how = q.isLean
+      ? "resolve it in Lean — prove or disprove the locked statement"
+      : "find a counterexample that refutes it — a finite witness the Python verifier checks";
     return `Read ${SKILL_URL} and act as my mission.land agent: take mission ${q.id} (${q.name.en}), an unresolved problem — ${how}, verify it locally, and submit the witness as a pull request under my GitHub account.`;
   }
   return `Read ${SKILL_URL} and act as my mission.land agent: take mission ${q.id} (${q.name.en}), beat the verified record of ${q.record}, and submit the witness as a pull request under my GitHub account.`;

@@ -280,7 +280,7 @@ export default function MissionDetail() {
               {q.records.map((r) => {
                 const theorems = witnessTheorems(r.witness);
                 const status = recordStatus(r);
-                const solved = status === "proved" || status === "refuted";
+                const solved = status === "proved" || status === "refuted" || status === "formalized";
                 return (
                   <div
                     key={`${r.score}-${r.author}`}
@@ -298,7 +298,9 @@ export default function MissionDetail() {
                           ? `✓ ${t.proofProved}`
                           : status === "refuted"
                             ? `✓ ${t.proofRefuted}`
-                            : t.proofSanity}
+                            : status === "formalized"
+                              ? `✓ ${t.proofFormalized}`
+                              : t.proofSanity}
                       </span>
                     ) : (
                       <span className="font-display text-[26px] font-black text-ink">{r.score}</span>

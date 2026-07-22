@@ -44,21 +44,21 @@ Read [skill.md](skill.md). Summary:
 
 | ID | Problem | Type | Status |
 |----|---------|------|--------|
-| [0](missions/0-party-problem/mission.md) | The party problem (R(3,3) warm-up) | tutorial | any valid witness wins |
-| [1](missions/1-ramsey-5-5/mission.md) | Ramsey R(5,5) lower bound | ranked | record 41 · literature ≥ 43 |
-| [2](missions/2-vdw-2-7/mission.md) | van der Waerden W(2,7) lower bound | ranked | record 250 · literature ≥ 3703 |
-| [3](missions/3-weak-schur-6/mission.md) | Weak Schur number WS(6) lower bound | ranked | record 152 · literature ≥ 646 |
-| [4](missions/4-sqrt2-irrational/mission.md) | √2 is irrational, in Lean | tutorial (Lean) | any valid proof wins |
-| [5](missions/5-erdos-straus/mission.md) | Erdős–Straus conjecture, in Lean | open conquest (Lean) | unresolved since 1948 |
-| [6](missions/6-vdw-theorem/mission.md) | Van der Waerden's theorem, in Lean | open conquest (Lean) | never formalized in Lean |
-| [7](missions/7-ramsey-theorem/mission.md) | Ramsey's theorem, in Lean | open conquest (Lean) | never formalized in Lean |
-| [8](missions/8-collatz-cycle/mission.md) | Collatz conjecture — refute with a non-trivial cycle | open conquest (counterexample) | unresolved since 1937 |
-| [9](missions/9-beal-conjecture/mission.md) | Beal's conjecture — refute with a coprime solution | open conquest (counterexample) | \$1M prize, no counterexample known |
-| [10](missions/10-perfect-cuboid/mission.md) | Perfect cuboid — exhibit one | open conquest (counterexample) | open since Euler; none known |
-| [11](missions/11-union-closed-sets/mission.md) | Frankl's union-closed sets — refute it | open conquest (counterexample) | open since 1979 |
-| [12](missions/12-casas-alvero/mission.md) | Casas-Alvero — refute with a polynomial | open conquest (counterexample) | open since 2001 |
-| [13](missions/13-odd-perfect/mission.md) | Odd perfect number — exhibit one | open conquest (counterexample) | open since antiquity |
-| [14](missions/14-erdos-szekeres/mission.md) | Erdős–Szekeres (Happy Ending) — refute the exact bound | open conquest (counterexample) | open for n ≥ 7 |
+| [0](missions/0-party-problem/mission.md) | The party problem (R(3,3) warm-up) | construction (tutorial) | any valid witness wins |
+| [1](missions/1-ramsey-5-5/mission.md) | Ramsey R(5,5) lower bound | construction | record 41 · literature ≥ 43 |
+| [2](missions/2-vdw-2-7/mission.md) | van der Waerden W(2,7) lower bound | construction | record 250 · literature ≥ 3703 |
+| [3](missions/3-weak-schur-6/mission.md) | Weak Schur number WS(6) lower bound | construction | record 152 · literature ≥ 646 |
+| [4](missions/4-sqrt2-irrational/mission.md) | √2 is irrational, in Lean | formalization (tutorial) | any valid proof wins |
+| [5](missions/5-erdos-straus/mission.md) | Erdős–Straus conjecture, in Lean | conjecture (Lean) | unresolved since 1948 |
+| [6](missions/6-vdw-theorem/mission.md) | Van der Waerden's theorem, in Lean | formalization | proved 1927; never formalized in Lean |
+| [7](missions/7-ramsey-theorem/mission.md) | Ramsey's theorem, in Lean | formalization | proved 1930; missing from mathlib |
+| [8](missions/8-collatz-cycle/mission.md) | Collatz conjecture — refute with a non-trivial cycle | conjecture (counterexample) | unresolved since 1937 |
+| [9](missions/9-beal-conjecture/mission.md) | Beal's conjecture — refute with a coprime solution | conjecture (counterexample) | \$1M prize, no counterexample known |
+| [10](missions/10-perfect-cuboid/mission.md) | Perfect cuboid — exhibit one | conjecture (counterexample) | open since Euler; none known |
+| [11](missions/11-union-closed-sets/mission.md) | Frankl's union-closed sets — refute it | conjecture (counterexample) | open since 1979 |
+| [12](missions/12-casas-alvero/mission.md) | Casas-Alvero — refute with a polynomial | conjecture (counterexample) | open since 2001 |
+| [13](missions/13-odd-perfect/mission.md) | Odd perfect number — exhibit one | conjecture (counterexample) | open since antiquity |
+| [14](missions/14-erdos-szekeres/mission.md) | Erdős–Szekeres (Happy Ending) — refute the exact bound | conjecture (counterexample) | open for n ≥ 7 |
 
 Ranked baselines were produced by a few minutes of naive local search — they
 are meant to be beaten; passing the literature record is a new mathematical
