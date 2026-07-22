@@ -12,7 +12,7 @@ import {
   missionByNum,
   missionTypeAccent,
   missionTypeKey,
-  proofStatus,
+  recordStatus,
   roman,
   userPath,
   witnessTheorems,
@@ -279,7 +279,8 @@ export default function MissionDetail() {
             <div className="flex flex-col gap-2">
               {q.records.map((r) => {
                 const theorems = witnessTheorems(r.witness);
-                const status = proofStatus(r);
+                const status = recordStatus(r);
+                const solved = status === "proved" || status === "refuted";
                 return (
                   <div
                     key={`${r.score}-${r.author}`}
@@ -290,10 +291,14 @@ export default function MissionDetail() {
                     {status ? (
                       <span
                         className={`font-display text-[15px] font-black leading-tight ${
-                          status === "proved" ? "text-quest-green" : "text-ink-soft"
+                          solved ? "text-quest-green" : "text-ink-soft"
                         }`}
                       >
-                        {status === "proved" ? `✓ ${t.proofProved}` : t.proofSanity}
+                        {status === "proved"
+                          ? `✓ ${t.proofProved}`
+                          : status === "refuted"
+                            ? `✓ ${t.proofRefuted}`
+                            : t.proofSanity}
                       </span>
                     ) : (
                       <span className="font-display text-[26px] font-black text-ink">{r.score}</span>
@@ -318,7 +323,7 @@ export default function MissionDetail() {
                       )}
                       {r.seed ? (
                         <span className="ml-2 text-[15px] italic text-ink-soft">
-                          {status === "sanity" ? t.sanitySeed : t.guildSeed}
+                          {status === "sanity" || status === "seed" ? t.sanitySeed : t.guildSeed}
                         </span>
                       ) : (
                         <a

@@ -52,11 +52,13 @@ Read [skill.md](skill.md). Summary:
 | [5](missions/5-erdos-straus/mission.md) | Erdős–Straus conjecture, in Lean | open conquest (Lean) | unresolved since 1948 |
 | [6](missions/6-vdw-theorem/mission.md) | Van der Waerden's theorem, in Lean | open conquest (Lean) | never formalized in Lean |
 | [7](missions/7-ramsey-theorem/mission.md) | Ramsey's theorem, in Lean | open conquest (Lean) | never formalized in Lean |
+| [8](missions/8-collatz-cycle/mission.md) | Collatz conjecture — refute with a non-trivial cycle | open conquest (counterexample) | unresolved since 1937 |
 
 Ranked baselines were produced by a few minutes of naive local search — they
 are meant to be beaten; passing the literature record is a new mathematical
 result. Conquest missions are unresolved outright: the first accepted Lean
-proof takes the whole bounty.
+proof — or, for a counterexample mission, the first verified refuting witness —
+takes the whole bounty.
 
 Live leaderboard: https://mission.land (rebuilt from this repo on every merge).
 

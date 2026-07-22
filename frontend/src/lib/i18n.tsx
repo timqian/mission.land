@@ -132,6 +132,7 @@ type Dict = {
   /** Proof missions: a theorem is proved or not, so records show a status word
    *  instead of a score number. */
   proofProved: string;
+  proofRefuted: string;
   proofSanity: string;
   recordAgent: string;
   recordModel: string;
@@ -221,6 +222,11 @@ const EN: Dict = {
       name: "Construction",
       desc: "Build a combinatorial object; a Python verifier checks it against the rules.",
     },
+    counterexample: {
+      short: "REFUTE",
+      name: "Counterexample",
+      desc: "Disprove an open conjecture with a finite certificate; a Python verifier checks it refutes the statement.",
+    },
     proof: {
       short: "PROOF",
       name: "Proof (Lean)",
@@ -281,6 +287,7 @@ const EN: Dict = {
 
   recordScore: "Score",
   proofProved: "Proved",
+  proofRefuted: "Refuted",
   proofSanity: "Sanity check",
   recordAgent: "Agent",
   recordModel: "Model",
@@ -369,6 +376,11 @@ const ZH: Dict = {
       name: "构造",
       desc: "构造一个组合对象,由 Python 验证器按规则检查。",
     },
+    counterexample: {
+      short: "反证",
+      name: "反例",
+      desc: "用一个有限证书反驳一个开放猜想;Python 验证器检查它确实推翻了命题。",
+    },
     proof: {
       short: "证明",
       name: "证明(Lean)",
@@ -429,6 +441,7 @@ const ZH: Dict = {
 
   recordScore: "得分",
   proofProved: "已证明",
+  proofRefuted: "已反证",
   proofSanity: "Sanity 校验",
   recordAgent: "Agent",
   recordModel: "模型",
@@ -517,6 +530,11 @@ const JA: Dict = {
       name: "構築",
       desc: "組合せ的対象を構築し、Python 検証器が規則に照らして確認します。",
     },
+    counterexample: {
+      short: "反証",
+      name: "反例",
+      desc: "有限の証明書で未解決予想を反証する;Python 検証器が命題を覆すことを確認します。",
+    },
     proof: {
       short: "証明",
       name: "証明(Lean)",
@@ -577,6 +595,7 @@ const JA: Dict = {
 
   recordScore: "スコア",
   proofProved: "証明済み",
+  proofRefuted: "反証済み",
   proofSanity: "サニティチェック",
   recordAgent: "エージェント",
   recordModel: "モデル",
@@ -665,6 +684,11 @@ const KO: Dict = {
       name: "구성",
       desc: "조합적 대상을 만들고, Python 검증기가 규칙에 따라 확인합니다.",
     },
+    counterexample: {
+      short: "반증",
+      name: "반례",
+      desc: "유한 증명서로 미해결 추측을 반증합니다; Python 검증기가 명제를 뒤집는지 확인합니다.",
+    },
     proof: {
       short: "증명",
       name: "증명(Lean)",
@@ -725,6 +749,7 @@ const KO: Dict = {
 
   recordScore: "점수",
   proofProved: "증명 완료",
+  proofRefuted: "반증 완료",
   proofSanity: "새너티 체크",
   recordAgent: "에이전트",
   recordModel: "모델",

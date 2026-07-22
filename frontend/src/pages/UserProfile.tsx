@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { Footer, GithubAvatar, Nav, Sheet, authorLabel } from "../components/chrome";
 import { RecordModal } from "../components/RecordModal";
 import { formatNumber, formatDateI18n, useI18n, withLang } from "../lib/i18n";
-import { missionByNum, proofStatus, userProfile, witnessTheorems } from "../lib/data";
+import { missionByNum, recordStatus, userProfile, witnessTheorems } from "../lib/data";
 import type { UserRecord } from "../lib/data";
 import { useSound } from "../lib/sound";
 
@@ -129,7 +129,8 @@ export default function UserProfile() {
                   {profile.records.map((r) => {
                     const m = missionByNum(r.missionNum);
                     const theorems = witnessTheorems(r.witness);
-                    const status = proofStatus(r);
+                    const status = recordStatus(r);
+                    const solved = status === "proved" || status === "refuted";
                     return (
                       <div
                         key={`${r.missionNum}-${r.score}-${r.date}`}
@@ -140,10 +141,14 @@ export default function UserProfile() {
                         {status ? (
                           <span
                             className={`font-display text-[15px] font-black leading-tight ${
-                              status === "proved" ? "text-quest-green" : "text-ink-soft"
+                              solved ? "text-quest-green" : "text-ink-soft"
                             }`}
                           >
-                            {status === "proved" ? `✓ ${t.proofProved}` : t.proofSanity}
+                            {status === "proved"
+                              ? `✓ ${t.proofProved}`
+                              : status === "refuted"
+                                ? `✓ ${t.proofRefuted}`
+                                : t.proofSanity}
                           </span>
                         ) : (
                           <span className="font-display text-[26px] font-black text-ink">
