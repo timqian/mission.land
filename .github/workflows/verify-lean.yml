@@ -1,69 +1,128 @@
 name: verify-lean
 
-# Proof missions are excluded from the fast stdlib verify workflow (their
-# meta.json declares heavy tools); this workflow verifies them instead.
-# When adding a new proof mission, add its path below.
+# Verifies proof (Lean) missions. Unlike the fast stdlib `verify` workflow, the
+# heavy Lean work only makes sense when a proof mission (or the shared Lean
+# tooling) actually changed — but the job still runs to completion on every PR
+# so `verify-lean` is a safe *required* status check (a job that is skipped
+# rather than completed can leave a required check stuck).
 on:
   pull_request:
-    paths:
-      - "missions/4-sqrt2-irrational/**"
-      - "missions/5-erdos-straus/**"
-      - "missions/6-vdw-theorem/**"
-      - "missions/7-ramsey-theorem/**"
-      - "tools/lean/**"
-      - ".github/workflows/verify-lean.yml"
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [main]
-    paths:
-      - "missions/4-sqrt2-irrational/**"
-      - "missions/5-erdos-straus/**"
-      - "missions/6-vdw-theorem/**"
-      - "missions/7-ramsey-theorem/**"
-      - "tools/lean/**"
-      - ".github/workflows/verify-lean.yml"
 
 permissions:
   contents: read
 
+# Cancel a PR's older in-progress runs when it's pushed again; let main finish.
+concurrency:
+  group: verify-lean-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  verify:
-    # Skip draft PRs — attempt logs shouldn't spin up the heavy Lean toolchain
-    # (see skill.md). Pushes to main always run.
+  verify-lean:
+    # Skip draft PRs — attempt logs shouldn't spin up the heavy Lean toolchain.
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need history to diff against the base / previous commit
+
+      # Decide what (if anything) needs the Lean toolchain. On a PR that touches
+      # no proof mission, this is the whole job — it completes green in seconds.
+      - name: Select proof missions to verify
+        id: select
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BASE: ${{ github.event.before }}
+          PUSH_HEAD: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          list_all() {
+            for d in missions/*/; do
+              [ -f "${d}challenge/comparator-config.json" ] && printf '%s\n' "$d"
+            done
+          }
+          if [ "$EVENT" = "pull_request" ]; then
+            base="$PR_BASE"; head="$PR_HEAD"
+          else
+            base="$PUSH_BASE"; head="$PUSH_HEAD"
+          fi
+          if [ -z "$base" ] || ! git cat-file -e "${base}^{commit}" 2>/dev/null; then
+            sel="$(list_all)" # new branch / unknown base → verify all, to be safe
+          else
+            changed="$(git diff --name-only "$base" "$head" || true)"
+            if printf '%s\n' "$changed" | grep -qE '^(tools/lean/|\.github/workflows/verify-lean\.yml)'; then
+              sel="$(list_all)"
+            else
+              sel=""
+              for d in $(printf '%s\n' "$changed" | grep -oE '^missions/[^/]+/' | sort -u || true); do
+                [ -f "${d}challenge/comparator-config.json" ] && sel="${sel}${d}"$'\n'
+              done
+            fi
+          fi
+          if [ -n "$sel" ]; then
+            { echo "missions<<EOF"; printf '%s\n' "$sel"; echo "EOF"; } >> "$GITHUB_OUTPUT"
+            echo "Will verify:"; printf '%s\n' "$sel"
+          else
+            echo "missions=" >> "$GITHUB_OUTPUT"
+            echo "No proof mission changed — nothing to verify."
+          fi
 
       - name: Install elan
+        if: steps.select.outputs.missions != ''
         run: |
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
             | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
       - name: Cache Lean toolchains
+        if: steps.select.outputs.missions != ''
         uses: actions/cache@v4
         with:
           path: ~/.elan/toolchains
           key: elan-${{ hashFiles('missions/*/challenge/lean-toolchain') }}
 
       - name: Cache comparator build
+        if: steps.select.outputs.missions != ''
         uses: actions/cache@v4
         with:
           path: ~/.cache/mission-land/comparator
           key: comparator-${{ hashFiles('tools/lean/comparator.lock') }}
 
+      # The dominant cost: materializing Mathlib. Keep the build dirs so
+      # `lake exe cache get` restores instead of re-fetching the whole olean set.
+      - name: Cache Mathlib build (oleans)
+        if: steps.select.outputs.missions != ''
+        uses: actions/cache@v4
+        with:
+          path: |
+            missions/*/challenge/.lake
+            ~/.cache/mathlib
+          key: lean-lake-${{ hashFiles('missions/*/challenge/lake-manifest.json', 'missions/*/challenge/lean-toolchain') }}
+          restore-keys: |
+            lean-lake-
+
       - name: Install landrun (sandbox; best effort)
+        if: steps.select.outputs.missions != ''
         run: |
           go install github.com/Zouuup/landrun@main \
             && echo "$HOME/go/bin" >> "$GITHUB_PATH" \
             || echo "::warning::landrun install failed — solutions build unsandboxed in this ephemeral runner"
 
-      - name: Verify all proof-mission records
+      - name: Verify selected proof-mission records
+        if: steps.select.outputs.missions != ''
+        env:
+          MISSIONS: ${{ steps.select.outputs.missions }}
         run: |
           set -euo pipefail
           found=0
-          for d in missions/*/; do
+          while IFS= read -r d; do
+            [ -n "$d" ] || continue
             [ -f "${d}challenge/comparator-config.json" ] || continue
             for r in "${d}"records/*.json; do
               found=1
@@ -71,5 +130,5 @@ jobs:
               python3 "${d}verify.py" "$r"
               echo "::endgroup::"
             done
-          done
-          [ "$found" = "1" ] || echo "no proof missions found"
+          done <<< "$MISSIONS"
+          [ "$found" = "1" ] || echo "no proof missions to verify"

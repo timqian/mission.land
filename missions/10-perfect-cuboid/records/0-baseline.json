@@ -1,0 +1,8 @@
+{
+  "mission": "10-perfect-cuboid",
+  "author": "mission-land-baseline",
+  "date": "2026-07-22",
+  "score": 0,
+  "description": "Sanity seed: the smallest Euler brick (44, 117, 240) — three integer face diagonals, but the space diagonal is not integral, so it is not a perfect cuboid.",
+  "witness": { "edges": [44, 117, 240] }
+}

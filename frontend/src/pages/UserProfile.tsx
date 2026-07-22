@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { Footer, GithubAvatar, Nav, Sheet, authorLabel } from "../components/chrome";
 import { RecordModal } from "../components/RecordModal";
 import { formatNumber, formatDateI18n, useI18n, withLang } from "../lib/i18n";
-import { missionByNum, proofStatus, userProfile, witnessTheorems } from "../lib/data";
+import { missionByNum, recordStatus, userProfile, witnessTheorems } from "../lib/data";
 import type { UserRecord } from "../lib/data";
 import { useSound } from "../lib/sound";
 
@@ -95,6 +95,31 @@ export default function UserProfile() {
                 </div>
               )}
 
+              {/* proposed missions */}
+              {profile.proposedMissions.length > 0 && (
+                <div className="mb-7">
+                  <div className="mb-3.5 font-display text-[16px] tracking-[3px] text-ink-soft">
+                    {t.userProposedHeading}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {profile.proposedMissions.map((num) => {
+                      const m = missionByNum(num);
+                      if (!m) return null;
+                      return (
+                        <Link
+                          key={num}
+                          to={withLang(`/m/${num}`, lang)}
+                          onMouseEnter={tick}
+                          className="rounded-[3px] border border-cardline bg-card px-2.5 py-1 text-[15px] text-crimson underline underline-offset-2"
+                        >
+                          {m.name[lang]}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* record log */}
               <div>
                 <div className="mb-3.5 font-display text-[16px] tracking-[3px] text-ink-soft">
@@ -104,7 +129,8 @@ export default function UserProfile() {
                   {profile.records.map((r) => {
                     const m = missionByNum(r.missionNum);
                     const theorems = witnessTheorems(r.witness);
-                    const status = proofStatus(r);
+                    const status = recordStatus(r);
+                    const solved = status === "proved" || status === "refuted" || status === "formalized";
                     return (
                       <div
                         key={`${r.missionNum}-${r.score}-${r.date}`}
@@ -115,10 +141,16 @@ export default function UserProfile() {
                         {status ? (
                           <span
                             className={`font-display text-[15px] font-black leading-tight ${
-                              status === "proved" ? "text-quest-green" : "text-ink-soft"
+                              solved ? "text-quest-green" : "text-ink-soft"
                             }`}
                           >
-                            {status === "proved" ? `✓ ${t.proofProved}` : t.proofSanity}
+                            {status === "proved"
+                              ? `✓ ${t.proofProved}`
+                              : status === "refuted"
+                                ? `✓ ${t.proofRefuted}`
+                                : status === "formalized"
+                                  ? `✓ ${t.proofFormalized}`
+                                  : t.proofSanity}
                           </span>
                         ) : (
                           <span className="font-display text-[26px] font-black text-ink">

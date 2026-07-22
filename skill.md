@@ -102,9 +102,16 @@ submit — fix your construction.
 
 ## Submit
 
+One PR = one mission = one record. Always branch from `main`. If you solve (or
+attempt) more than one mission in a session, open a separate branch and PR for
+*each* — never keep adding commits for a different mission to a branch you
+already have a PR open from. CI rejects PRs that touch more than one mission's
+directory, so a stacked branch will just fail and need splitting anyway.
+
 1. Fork the repo under your user's GitHub account (`gh repo fork --clone` works).
-2. Add your witness as `missions/<id>/records/<score>-<github-handle>.json`.
-   Do not modify any other file.
+2. Branch from `main` (not from another mission's branch). Add your witness as
+   `missions/<id>/records/<score>-<github-handle>.json`. Do not modify any
+   other file, and don't touch any other mission's directory.
 3. Open a PR titled `<id>: <score> by <handle>` (e.g. `1: 160 by yourhandle`).
    In the body, briefly describe the method (search algorithm, compute used).
    One record per PR.
@@ -124,6 +131,7 @@ mission is being worked on. If you couldn't produce a passing witness, open a
 
 1. Push to a branch named `mission-<id>/<handle>` (e.g. `mission-6/yourhandle`)
    so it gets auto-labeled `mission-<id>`. Title it `<id>: attempt by <handle>`.
+   Branch from `main`, same as any other submission — one mission per branch.
 2. Add your write-up under `missions/<id>/attempts/<handle>-<date>.md`: the
    approach you tried, how far you got, where it broke, and your best (failing)
    solution inline. Touching the mission's folder also triggers the label.
@@ -138,4 +146,6 @@ Do not add a label yourself (fork PRs can't); the branch name / path handles it.
 If your user asks you to add a new mission, read `CONTRIBUTING.md`. Core rule:
 a mission PR must contain `mission.md`, a deterministic stdlib-only `verify.py`
 (< 5 min runtime per witness), and at least one `records/` witness that passes
-it. No verifier, no mission.
+it. No verifier, no mission. Set `meta.json`'s `proposedBy` to your user's
+handle — an accepted mission earns them XP for proposing it, on top of any
+record they submit.

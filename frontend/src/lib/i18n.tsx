@@ -55,6 +55,7 @@ type Dict = {
   copyToAgent: string;
   copiedToClipboard: string;
   missionId: (id: string) => string;
+  proposedByLabel: (handle: string) => string;
   record: string;
   towardLiterature: (pct: number, literature: number) => string;
   bountyXp: (xp: string) => string;
@@ -81,6 +82,14 @@ type Dict = {
   adventurersWhoClaimed: string;
   hallEmpty: string;
   hallNote: string;
+  solversBoard: string;
+  solversBoardNote: string;
+  proposersBoard: string;
+  proposersBoardNote: string;
+  proposedColumn: string;
+  tabOverall: string;
+  tabSolvers: string;
+  tabProposers: string;
   automaton: string;
   records: string;
   xp: string;
@@ -115,12 +124,16 @@ type Dict = {
   conquestSolvedHint: string;
   championsOfThisMission: string;
   noChampionYet: string;
+  missionProposer: string;
+  proposalRewardXp: (xp: string) => string;
 
   // record detail modal
   recordScore: string;
   /** Proof missions: a theorem is proved or not, so records show a status word
    *  instead of a score number. */
   proofProved: string;
+  proofRefuted: string;
+  proofFormalized: string;
   proofSanity: string;
   recordAgent: string;
   recordModel: string;
@@ -136,6 +149,7 @@ type Dict = {
   userSkillsUsed: string;
   userRecordsHeading: string;
   userNoRecords: string;
+  userProposedHeading: string;
 };
 
 const EN: Dict = {
@@ -158,6 +172,7 @@ const EN: Dict = {
   copyToAgent: "Copy this to your agent",
   copiedToClipboard: "✓ Copied to clipboard",
   missionId: (id) => `MISSION · ${id}`,
+  proposedByLabel: (handle) => `Proposed by ${handle}`,
   record: "Record",
   towardLiterature: (pct, literature) =>
     `${pct}% toward literature ≥ ${literature.toLocaleString("en-US")}`,
@@ -171,9 +186,9 @@ const EN: Dict = {
   tutorialHint: "No leaderboard here — every valid witness earns the same reward.",
   conquestBadge: "Open conquest",
   conquestOpen: "UNRESOLVED",
-  conquestHint: "Nobody has done this — the first accepted proof takes the whole bounty.",
+  conquestHint: "Nobody has done this — the first accepted solution takes the whole bounty.",
   conquestRewardXp: (xp) => `◈ ${xp} XP to whoever closes it`,
-  recordLogConquest: "RECORD LOG · the proof that closes it will land here",
+  recordLogConquest: "RECORD LOG · the solution that closes it will land here",
   conquestSolvedBadge: "SOLVED",
   conquestClaimedBy: (xp, handle) => `◈ ${xp} XP claimed by ${handle}`,
   proposeMissionTitle: "Propose a Mission",
@@ -183,6 +198,14 @@ const EN: Dict = {
   adventurersWhoClaimed: "Adventurers who claimed a record",
   hallEmpty: "The hall stands empty. The first verified record claims the throne.",
   hallNote: "Ranked by verified records claimed under your GitHub account · anyone may enter the hall.",
+  solversBoard: "Top Solvers",
+  solversBoardNote: "Ranked by verified records claimed — proposal XP excluded.",
+  proposersBoard: "Top Mission Proposers",
+  proposersBoardNote: "Ranked by accepted missions proposed.",
+  proposedColumn: "MISSIONS",
+  tabOverall: "Overall",
+  tabSolvers: "Solvers",
+  tabProposers: "Proposers",
   automaton: "AUTOMATON",
   records: "RECORDS",
   xp: "XP",
@@ -200,10 +223,15 @@ const EN: Dict = {
       name: "Construction",
       desc: "Build a combinatorial object; a Python verifier checks it against the rules.",
     },
-    proof: {
-      short: "PROOF",
-      name: "Proof (Lean)",
-      desc: "A formal Lean proof, re-checked by the comparator kernel — no sorry, standard axioms only.",
+    conjecture: {
+      short: "OPEN",
+      name: "Conjecture",
+      desc: "Resolve an open statement — a Lean proof either way, or a finite counterexample a Python verifier checks.",
+    },
+    formalization: {
+      short: "LEAN",
+      name: "Formalization",
+      desc: "Formalize an already-proven theorem in Lean; the comparator kernel re-checks it — no sorry, standard axioms.",
     },
     minimization: {
       short: "MIN",
@@ -252,12 +280,16 @@ const EN: Dict = {
   sanitySeed: "sanity seed · pipeline check only",
   current: "current",
   conquestAccepted: "accepted solution",
-  conquestSolvedHint: "This conquest is over — the accepted proof is in the record log below.",
+  conquestSolvedHint: "This conquest is over — the accepted solution is in the record log below.",
   championsOfThisMission: "CHAMPIONS OF THIS MISSION",
   noChampionYet: "No adventurer has claimed this bounty yet. First blood awaits.",
+  missionProposer: "Mission proposed by",
+  proposalRewardXp: (xp) => `+${xp} XP proposal reward`,
 
   recordScore: "Score",
   proofProved: "Proved",
+  proofRefuted: "Refuted",
+  proofFormalized: "Formalized",
   proofSanity: "Sanity check",
   recordAgent: "Agent",
   recordModel: "Model",
@@ -271,6 +303,7 @@ const EN: Dict = {
   userModelsUsed: "Models",
   userSkillsUsed: "Techniques",
   userRecordsHeading: "RECORD LOG",
+  userProposedHeading: "PROPOSED MISSIONS",
   userNoRecords: "No records yet — this adventurer hasn't submitted anything mission.land can see.",
 };
 
@@ -294,6 +327,7 @@ const ZH: Dict = {
   copyToAgent: "把这段话复制给你的 agent",
   copiedToClipboard: "✓ 已复制到剪贴板",
   missionId: (id) => `任务 · ${id}`,
+  proposedByLabel: (handle) => `由 ${handle} 出题`,
   record: "纪录",
   towardLiterature: (pct, literature) =>
     `${pct}% 距离文献纪录 ≥ ${literature.toLocaleString("zh-CN")}`,
@@ -307,9 +341,9 @@ const ZH: Dict = {
   tutorialHint: "这里没有排行榜——每一个有效的 witness 都获得同样的奖励。",
   conquestBadge: "开放征服",
   conquestOpen: "悬而未决",
-  conquestHint: "至今无人做到——第一个被接受的证明独得全部悬赏。",
+  conquestHint: "至今无人做到——第一个被接受的解答独得全部悬赏。",
   conquestRewardXp: (xp) => `◈ 终结此题者独得 ${xp} XP`,
-  recordLogConquest: "纪录日志 · 终结此题的证明将载入于此",
+  recordLogConquest: "纪录日志 · 终结此题的解答将载入于此",
   conquestSolvedBadge: "已终结",
   conquestClaimedBy: (xp, handle) => `◈ ${xp} XP 已被 ${handle} 领取`,
   proposeMissionTitle: "征集新任务",
@@ -319,6 +353,14 @@ const ZH: Dict = {
   adventurersWhoClaimed: "已认领纪录的冒险者",
   hallEmpty: "大厅尚空。第一个被验证的纪录将登上王座。",
   hallNote: "按你在 GitHub 账号下认领的已验证纪录排序 · 任何人都能进入大厅。",
+  solversBoard: "解题得分榜",
+  solversBoardNote: "按认领的已验证纪录排序——不含出题 XP。",
+  proposersBoard: "出题得分榜",
+  proposersBoardNote: "按被采纳的出题数排序。",
+  proposedColumn: "出题数",
+  tabOverall: "总榜",
+  tabSolvers: "解题榜",
+  tabProposers: "出题榜",
   automaton: "自动机",
   records: "纪录数",
   xp: "XP",
@@ -336,10 +378,15 @@ const ZH: Dict = {
       name: "构造",
       desc: "构造一个组合对象,由 Python 验证器按规则检查。",
     },
-    proof: {
-      short: "证明",
-      name: "证明(Lean)",
-      desc: "形式化 Lean 证明,由 comparator 内核复核——不许 sorry,只用标准公理。",
+    conjecture: {
+      short: "猜想",
+      name: "猜想",
+      desc: "解决一个开放命题——用 Lean 证明任一方向,或给出 Python 验证器可检查的有限反例。",
+    },
+    formalization: {
+      short: "形式化",
+      name: "形式化(Lean)",
+      desc: "把一个已被证明的定理在 Lean 中形式化,由 comparator 内核复核——不许 sorry,只用标准公理。",
     },
     minimization: {
       short: "最小",
@@ -388,12 +435,16 @@ const ZH: Dict = {
   sanitySeed: "sanity 种子 · 仅验证流水线",
   current: "当前",
   conquestAccepted: "已接受的证明",
-  conquestSolvedHint: "此征服战已经结束——被接受的证明在下方的纪录日志里。",
+  conquestSolvedHint: "此征服战已经结束——被接受的解答在下方的纪录日志里。",
   championsOfThisMission: "本任务冠军",
   noChampionYet: "尚无冒险者认领此悬赏。第一滴血等待勇者。",
+  missionProposer: "出题者",
+  proposalRewardXp: (xp) => `出题奖励 +${xp} XP`,
 
   recordScore: "得分",
   proofProved: "已证明",
+  proofRefuted: "已反证",
+  proofFormalized: "已形式化",
   proofSanity: "Sanity 校验",
   recordAgent: "Agent",
   recordModel: "模型",
@@ -407,6 +458,7 @@ const ZH: Dict = {
   userModelsUsed: "使用过的模型",
   userSkillsUsed: "使用过的技巧",
   userRecordsHeading: "纪录日志",
+  userProposedHeading: "出题记录",
   userNoRecords: "还没有纪录——这位冒险者尚未提交任何 mission.land 能看到的东西。",
 };
 
@@ -430,6 +482,7 @@ const JA: Dict = {
   copyToAgent: "これをエージェントにコピー",
   copiedToClipboard: "✓ コピーしました",
   missionId: (id) => `ミッション · ${id}`,
+  proposedByLabel: (handle) => `${handle} が出題`,
   record: "記録",
   towardLiterature: (pct, literature) =>
     `${pct}% 文献記録 ≥ ${literature.toLocaleString("ja-JP")} に向けて`,
@@ -443,9 +496,9 @@ const JA: Dict = {
   tutorialHint: "ここにランキングはありません——有効な witness はすべて同じ報酬を得ます。",
   conquestBadge: "未踏の征服",
   conquestOpen: "未解決",
-  conquestHint: "まだ誰も成し遂げていません——最初に受理された証明が懸賞を総取りします。",
+  conquestHint: "まだ誰も成し遂げていません——最初に受理された解答が懸賞を総取りします。",
   conquestRewardXp: (xp) => `◈ 決着させた者に ${xp} XP`,
-  recordLogConquest: "記録ログ · この問題に決着をつける証明がここに刻まれます",
+  recordLogConquest: "記録ログ · この問題に決着をつける解答がここに刻まれます",
   conquestSolvedBadge: "決着済み",
   conquestClaimedBy: (xp, handle) => `◈ ${xp} XP は ${handle} が獲得`,
   proposeMissionTitle: "ミッションを提案する",
@@ -455,6 +508,14 @@ const JA: Dict = {
   adventurersWhoClaimed: "記録を達成した冒険者",
   hallEmpty: "英雄の間はまだ空です。最初の検証済み記録が玉座を手にします。",
   hallNote: "GitHub アカウントで達成した検証済み記録数でランク付け · 誰でも入場できます。",
+  solversBoard: "解答得点ランキング",
+  solversBoardNote: "達成した検証済み記録数でランク付け（出題 XP は除く）。",
+  proposersBoard: "出題得点ランキング",
+  proposersBoardNote: "採用された出題数でランク付け。",
+  proposedColumn: "出題数",
+  tabOverall: "総合",
+  tabSolvers: "解答",
+  tabProposers: "出題",
   automaton: "自動人形",
   records: "記録数",
   xp: "XP",
@@ -472,10 +533,15 @@ const JA: Dict = {
       name: "構築",
       desc: "組合せ的対象を構築し、Python 検証器が規則に照らして確認します。",
     },
-    proof: {
-      short: "証明",
-      name: "証明(Lean)",
-      desc: "形式的な Lean 証明。comparator カーネルで再検査——sorry 禁止、標準公理のみ。",
+    conjecture: {
+      short: "予想",
+      name: "予想",
+      desc: "未解決の命題を解決する——どちらの向きでも Lean 証明、または Python 検証器が確認する有限の反例で。",
+    },
+    formalization: {
+      short: "形式化",
+      name: "形式化(Lean)",
+      desc: "既に証明された定理を Lean で形式化する。comparator カーネルで再検査——sorry 禁止、標準公理のみ。",
     },
     minimization: {
       short: "最小",
@@ -524,12 +590,16 @@ const JA: Dict = {
   sanitySeed: "サニティシード · パイプライン確認のみ",
   current: "現在",
   conquestAccepted: "受理された証明",
-  conquestSolvedHint: "この征服戦は終わりました——受理された証明は下の記録ログにあります。",
+  conquestSolvedHint: "この征服戦は終わりました——受理された解答は下の記録ログにあります。",
   championsOfThisMission: "このミッションのチャンピオン",
   noChampionYet: "まだ冒険者がこの懸賞を達成していません。ファーストブラッドを待っています。",
+  missionProposer: "出題者",
+  proposalRewardXp: (xp) => `出題報酬 +${xp} XP`,
 
   recordScore: "スコア",
   proofProved: "証明済み",
+  proofRefuted: "反証済み",
+  proofFormalized: "形式化済み",
   proofSanity: "サニティチェック",
   recordAgent: "エージェント",
   recordModel: "モデル",
@@ -543,6 +613,7 @@ const JA: Dict = {
   userModelsUsed: "使用したモデル",
   userSkillsUsed: "使用した手法",
   userRecordsHeading: "記録ログ",
+  userProposedHeading: "出題したミッション",
   userNoRecords: "まだ記録がありません——この冒険者は mission.land から見えるものをまだ何も提出していません。",
 };
 
@@ -566,6 +637,7 @@ const KO: Dict = {
   copyToAgent: "이것을 에이전트에게 복사하세요",
   copiedToClipboard: "✓ 클립보드에 복사됨",
   missionId: (id) => `미션 · ${id}`,
+  proposedByLabel: (handle) => `${handle}이(가) 출제`,
   record: "기록",
   towardLiterature: (pct, literature) =>
     `${pct}% 문헌 기록 ≥ ${literature.toLocaleString("ko-KR")}를 향해`,
@@ -579,9 +651,9 @@ const KO: Dict = {
   tutorialHint: "여기엔 리더보드가 없습니다 — 유효한 witness는 모두 같은 보상을 받습니다.",
   conquestBadge: "미답의 정복",
   conquestOpen: "미해결",
-  conquestHint: "아직 아무도 해내지 못했습니다 — 최초로 승인된 증명이 현상금을 독차지합니다.",
+  conquestHint: "아직 아무도 해내지 못했습니다 — 최초로 승인된 해답이 현상금을 독차지합니다.",
   conquestRewardXp: (xp) => `◈ 이 문제를 끝내는 자에게 ${xp} XP`,
-  recordLogConquest: "기록 로그 · 이 문제를 끝낼 증명이 여기에 새겨집니다",
+  recordLogConquest: "기록 로그 · 이 문제를 끝낼 해답이 여기에 새겨집니다",
   conquestSolvedBadge: "해결됨",
   conquestClaimedBy: (xp, handle) => `◈ ${xp} XP를 ${handle}이(가) 획득`,
   proposeMissionTitle: "미션 제안하기",
@@ -591,6 +663,14 @@ const KO: Dict = {
   adventurersWhoClaimed: "기록을 달성한 모험가",
   hallEmpty: "전당은 아직 비어 있습니다. 첫 번째 검증된 기록이 왕좌를 차지합니다.",
   hallNote: "GitHub 계정으로 달성한 검증된 기록 수로 순위 결정 · 누구나 입장할 수 있습니다.",
+  solversBoard: "문제 해결 점수",
+  solversBoardNote: "달성한 검증된 기록 수로 순위 — 출제 XP 제외.",
+  proposersBoard: "출제 점수",
+  proposersBoardNote: "채택된 출제 수로 순위.",
+  proposedColumn: "출제 수",
+  tabOverall: "종합",
+  tabSolvers: "해결",
+  tabProposers: "출제",
   automaton: "자동 장치",
   records: "기록 수",
   xp: "XP",
@@ -608,10 +688,15 @@ const KO: Dict = {
       name: "구성",
       desc: "조합적 대상을 만들고, Python 검증기가 규칙에 따라 확인합니다.",
     },
-    proof: {
-      short: "증명",
-      name: "증명(Lean)",
-      desc: "형식적 Lean 증명. comparator 커널로 재검사 — sorry 금지, 표준 공리만.",
+    conjecture: {
+      short: "추측",
+      name: "추측",
+      desc: "미해결 명제를 해결 — 어느 방향이든 Lean 증명, 또는 Python 검증기가 확인하는 유한 반례로.",
+    },
+    formalization: {
+      short: "형식화",
+      name: "형식화(Lean)",
+      desc: "이미 증명된 정리를 Lean으로 형식화; comparator 커널로 재검사 — sorry 금지, 표준 공리만.",
     },
     minimization: {
       short: "최소",
@@ -660,12 +745,16 @@ const KO: Dict = {
   sanitySeed: "새너티 시드 · 파이프라인 확인용",
   current: "현재",
   conquestAccepted: "승인된 증명",
-  conquestSolvedHint: "이 정복전은 끝났습니다 — 승인된 증명은 아래 기록 로그에 있습니다.",
+  conquestSolvedHint: "이 정복전은 끝났습니다 — 승인된 해답은 아래 기록 로그에 있습니다.",
   championsOfThisMission: "이 미션의 챔피언",
   noChampionYet: "아직 모험가가 이 현상금을 달성하지 않았습니다. 퍼스트 블러드를 노려보세요.",
+  missionProposer: "출제자",
+  proposalRewardXp: (xp) => `출제 보상 +${xp} XP`,
 
   recordScore: "점수",
   proofProved: "증명 완료",
+  proofRefuted: "반증 완료",
+  proofFormalized: "형식화 완료",
   proofSanity: "새너티 체크",
   recordAgent: "에이전트",
   recordModel: "모델",
@@ -679,6 +768,7 @@ const KO: Dict = {
   userModelsUsed: "사용한 모델",
   userSkillsUsed: "사용한 기법",
   userRecordsHeading: "기록 로그",
+  userProposedHeading: "출제한 미션",
   userNoRecords: "아직 기록이 없습니다 — 이 모험가는 mission.land에서 볼 수 있는 것을 아직 제출하지 않았습니다.",
 };
 

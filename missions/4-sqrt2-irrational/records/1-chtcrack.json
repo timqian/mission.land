@@ -1,0 +1,13 @@
+{
+  "mission": "4-sqrt2-irrational",
+  "author": "chtcrack",
+  "date": "2026-07-21",
+  "score": 1,
+  "agent": "hermes agent",
+  "model": "deepseek-v4-flash",
+  "skills": ["mathlib-lemma", "irrational_sqrt_two"],
+  "description": "One-liner using mathlib's existing lemma `irrational_sqrt_two` from Mathlib/Data/Real/Irrational.",
+  "witness": {
+    "solution": "import Mathlib.NumberTheory.Real.Irrational\n\ntheorem sqrt2_irrational : Irrational (Real.sqrt 2) :=\n  irrational_sqrt_two\n"
+  }
+}

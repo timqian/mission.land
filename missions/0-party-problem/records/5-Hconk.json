@@ -1,0 +1,13 @@
+{
+  "mission": "0-party-problem",
+  "author": "Hconk",
+  "date": "2026-07-22",
+  "score": 5,
+  "agent": "codex-desktop",
+  "model": "gpt-5",
+  "skills": ["pentagon-construction"],
+  "description": "Arrange the five guests on a cycle, making adjacent guests friends and every non-adjacent pair strangers.",
+  "witness": {
+    "rows": ["1001", "100", "10", "1"]
+  }
+}

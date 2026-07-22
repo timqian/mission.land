@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { MissionRecord } from "../lib/data";
-import { proofStatus, witnessTheorems } from "../lib/data";
+import { recordStatus, witnessTheorems } from "../lib/data";
 import { GithubAvatar, authorLabel } from "./chrome";
 import { formatDateI18n, useI18n } from "../lib/i18n";
 
@@ -40,7 +40,8 @@ export function RecordModal({
 
   const solution = extractSolution(record.witness);
   const theorems = witnessTheorems(record.witness);
-  const status = proofStatus(record);
+  const status = recordStatus(record);
+  const resolved = status === "proved" || status === "refuted" || status === "formalized";
   let witnessJson: string | null = null;
   if (!solution && record.witness !== undefined) {
     try {
@@ -84,12 +85,18 @@ export function RecordModal({
           {status ? (
             <span
               className={`rounded-[3px] border px-2 py-1 font-display ${
-                status === "proved"
+                resolved
                   ? "border-quest-green/50 bg-lore text-quest-green"
                   : "border-cardline bg-card text-ink-soft"
               }`}
             >
-              {status === "proved" ? `✓ ${t.proofProved}` : t.proofSanity}
+              {status === "proved"
+                ? `✓ ${t.proofProved}`
+                : status === "refuted"
+                  ? `✓ ${t.proofRefuted}`
+                  : status === "formalized"
+                    ? `✓ ${t.proofFormalized}`
+                    : t.proofSanity}
             </span>
           ) : (
             <span className="rounded-[3px] border border-cardline bg-card px-2 py-1 font-display">

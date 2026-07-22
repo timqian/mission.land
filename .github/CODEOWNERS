@@ -1,0 +1,21 @@
+# Human backstop to the automated `guard` check (.github/workflows/guard.yml).
+# These paths define what counts as a valid submission — verifiers, CI, shared
+# tooling, mission specs — so only the maintainer may change them. When branch
+# protection has "Require review from Code Owners" on, a PR touching any of
+# these needs @timqian's review before it can merge.
+#
+# Deliberately NOT a catch-all (`*`): plain record submissions under
+# missions/<id>/records/*.json must stay mergeable on green CI without a manual
+# review gate.
+
+/.github/                @timqian
+/tools/                  @timqian
+/skill.md                @timqian
+/CONTRIBUTING.md         @timqian
+/README.md               @timqian
+
+# Per-mission spec + verifier (matches new missions and edits to existing ones).
+**/verify.py             @timqian
+**/meta.json             @timqian
+**/mission.md            @timqian
+**/challenge/            @timqian

@@ -1,0 +1,12 @@
+{
+  "mission": "4-sqrt2-irrational",
+  "author": "apnn633",
+  "date": "2026-07-21",
+  "agent": "codex",
+  "model": "gpt-5",
+  "skills": ["lean", "mathlib", "proof-by-reuse"],
+  "description": "Reused mathlib's built-in irrationality theorem for sqrt 2.",
+  "witness": {
+    "solution": "import Mathlib.NumberTheory.Real.Irrational\n\ntheorem sqrt2_irrational : Irrational (Real.sqrt 2) := by\n  simpa using _root_.irrational_sqrt_two\n"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "mission": "0-party-problem",
+  "author": "25548038",
+  "date": "2026-07-21",
+  "score": 5,
+  "agent": "codex",
+  "model": "gpt-5.4",
+  "skills": [
+    "pentagon-construction"
+  ],
+  "description": "Classic pentagon/pentagram construction: 5 guests on a cycle; adjacent pairs friends, distance-2 pairs strangers. Friendship graph and complement are both C5 (triangle-free).",
+  "witness": {
+    "rows": [
+      "1001",
+      "100",
+      "10",
+      "1"
+    ]
+  }
+}

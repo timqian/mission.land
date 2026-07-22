@@ -28,34 +28,58 @@ missions/<id>-<slug>/
     └── <score>-<your-handle>.json   # required: at least one passing witness
 ```
 
-Missions come in two types, declared in `meta.json`:
+Set `"proposedBy": "<your-github-handle>"` in `meta.json` — an accepted
+mission earns its proposer a flat, one-time XP reward on the leaderboard,
+separate from (and on top of) any record they later submit for it. Omit it
+only if the baseline witness itself is meant to be anonymous/seed data (its
+`author` ends in `-baseline`).
 
-- **`construction`** (the default) — the witness is a combinatorial object
-  (partition, coloring, graph) and `verify.py` recomputes its score.
-  Leaderboard-ranked unless it's a tutorial.
-- **`proof`** — the witness embeds a complete Lean proof of a statement locked
-  in `challenge/Challenge.lean`. Verified by
-  [leanprover/comparator](https://github.com/leanprover/comparator), which
-  pins statement, axioms, and kernel-checks the proof. The comparator version
-  is pinned once for the whole repo in `tools/lean/comparator.lock`; upgrading
-  it (plus each proof mission's `lean-toolchain` / mathlib pin, which share
-  its version number) upgrades every proof mission at once.
+Missions come in three types, declared in `meta.json`. The split is by *goal
+shape*, not by tooling:
 
-  A proof mission locks one or more theorems. Single-statement missions (like
-  mission 4) require all of them, so a proof scores `1`. Research missions
-  declare per-theorem scores in `meta.json` —
+- **`construction`** (the default) — climb a **ranked bound**. The witness is a
+  combinatorial object (partition, coloring, graph) and `verify.py` recomputes
+  its score; a higher score is a better record. Leaderboard-ranked.
+- **`conjecture`** — **resolve an open statement**. There is no rank, only a
+  binary solved-flag: `0` for a **sanity seed** (a valid certificate for the
+  trivial/known instance, which proves the pipeline runs without pretending the
+  problem is solved) and `> 0` for a resolution. Displayed as a **conquest** —
+  first to resolve takes the bounty. A conjecture can be resolved two ways, and
+  a mission may offer either or both:
+  - a **finite counterexample** the stdlib `verify.py` checks exactly (a Collatz
+    cycle, a coprime Beal solution, an odd perfect number). Fast lane, same
+    rules as `construction`. Only qualifies when the *disproof direction* is a
+    finite object checkable in under 5 min with stdlib Python (see mission 8).
+  - a **Lean proof** — of the statement or its negation — locked in
+    `challenge/Challenge.lean` and kernel-checked by the comparator (see below).
+    Lock both directions (`foo` and `foo_false`) so a disproof is worth as much
+    as a proof (mission 5).
+- **`formalization`** — **formalize an already-proven theorem** in Lean (√2
+  irrational, van der Waerden's theorem, Ramsey's theorem). The math is settled;
+  the deliverable is the formal proof, kernel-checked by the comparator. Same
+  Lean machinery as a conjecture's proof path, but it is *not* new mathematics —
+  it's a mathlib-style contribution.
 
-  ```json
-  "proof": { "theorems": { "erdos_straus_sanity": 0, "erdos_242": 1, "erdos_242_false": 1 } }
-  ```
+Both Lean uses (`conjecture` proofs and `formalization`) embed a complete
+proof of a statement locked in `challenge/Challenge.lean`, verified by
+[leanprover/comparator](https://github.com/leanprover/comparator), which pins
+statement, axioms, and kernel-checks the proof. The comparator version is pinned
+once for the whole repo in `tools/lean/comparator.lock`; upgrading it (plus each
+Lean mission's `lean-toolchain` / mathlib pin, which share its version number)
+upgrades every Lean mission at once.
 
-  — and each record picks what it proves via `witness.theorems`. The 0-score
-  *sanity* theorem (a trivial instance of the real statement) is what makes an
-  open problem compatible with "no verifier, no mission": the committed
-  baseline proves the sanity theorem, demonstrating the whole pipeline on this
-  exact challenge, without pretending the open problem is solved. For a
-  genuinely open conjecture, lock both directions (`foo` and `foo_false`) so a
-  counterexample is worth as much as a proof.
+A Lean mission locks one or more theorems. Single-statement missions (like
+mission 4) require all of them, so a proof scores `1`. Missions with a
+sanity/real split declare per-theorem scores in `meta.json` —
+
+```json
+"proof": { "theorems": { "erdos_straus_sanity": 0, "erdos_242": 1, "erdos_242_false": 1 } }
+```
+
+— and each record picks what it proves via `witness.theorems`. The 0-score
+*sanity* theorem (a trivial instance of the real statement) is the Lean analogue
+of the sanity seed: the committed baseline proves it, demonstrating the pipeline
+on this exact challenge without pretending the problem is solved.
 
 `<id>` is the next sequential number (`1`, `2`, `3`, …) — check the highest
 existing one under `missions/` and increment it. `0` is reserved for the

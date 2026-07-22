@@ -5,13 +5,14 @@ import { RecordModal } from "../components/RecordModal";
 import { MissionTypesModal } from "../components/MissionTypesModal";
 import {
   LITERATURE_BREAKTHROUGH_XP,
+  MISSION_PROPOSAL_XP,
   REPO_URL,
   agentPrompt,
   conquestSolved,
   missionByNum,
   missionTypeAccent,
   missionTypeKey,
-  proofStatus,
+  recordStatus,
   roman,
   userPath,
   witnessTheorems,
@@ -59,15 +60,15 @@ export default function MissionDetail() {
         </div>
         <Sheet>
           {/* mission header */}
-          <div className="mb-[26px] flex items-start justify-between border-b-2 border-divider pb-[22px]">
-            <div>
+          <div className="mb-[26px] flex items-start justify-between gap-4 border-b-2 border-divider pb-[22px]">
+            <div className="min-w-0">
               <div className="mb-2 font-display text-[14px] tracking-[5px] text-ink-soft">
                 {t.missionId(q.id)}
               </div>
               <h1 className="mb-2 font-display text-[42px] font-black leading-tight text-ink max-md:text-[28px]">
                 {q.name[lang]}
               </h1>
-              <div className="text-[22px] text-ink-body">{q.tagline[lang]}</div>
+              <div className="text-[22px] text-ink-body max-md:text-[18px]">{q.tagline[lang]}</div>
             </div>
             <button
               type="button"
@@ -247,6 +248,25 @@ export default function MissionDetail() {
             </code>
           </div>
 
+          {/* mission proposer — a quiet one-line credit, not a content band */}
+          {q.proposedBy && (
+            <div className="mb-[22px] flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px] text-ink-soft">
+              <span>{t.missionProposer}</span>
+              <Link
+                to={withLang(userPath(q.proposedBy), lang)}
+                onMouseEnter={tick}
+                className="inline-flex items-center gap-1.5 text-ink-body hover:text-crimson"
+              >
+                <GithubAvatar author={q.proposedBy} size={20} border="#b89a63" />
+                {authorLabel(q.proposedBy)}
+              </Link>
+              <span className="text-ink-soft">·</span>
+              <span className="font-bold text-gold">
+                {t.proposalRewardXp(formatNumber(MISSION_PROPOSAL_XP, lang))}
+              </span>
+            </div>
+          )}
+
           {/* record log */}
           <div ref={recordLogRef} className="mb-[30px] scroll-mt-4">
             <div className="mb-3.5 font-display text-[16px] tracking-[3px] text-ink-soft">
@@ -259,7 +279,8 @@ export default function MissionDetail() {
             <div className="flex flex-col gap-2">
               {q.records.map((r) => {
                 const theorems = witnessTheorems(r.witness);
-                const status = proofStatus(r);
+                const status = recordStatus(r);
+                const solved = status === "proved" || status === "refuted" || status === "formalized";
                 return (
                   <div
                     key={`${r.score}-${r.author}`}
@@ -270,10 +291,16 @@ export default function MissionDetail() {
                     {status ? (
                       <span
                         className={`font-display text-[15px] font-black leading-tight ${
-                          status === "proved" ? "text-quest-green" : "text-ink-soft"
+                          solved ? "text-quest-green" : "text-ink-soft"
                         }`}
                       >
-                        {status === "proved" ? `✓ ${t.proofProved}` : t.proofSanity}
+                        {status === "proved"
+                          ? `✓ ${t.proofProved}`
+                          : status === "refuted"
+                            ? `✓ ${t.proofRefuted}`
+                            : status === "formalized"
+                              ? `✓ ${t.proofFormalized}`
+                              : t.proofSanity}
                       </span>
                     ) : (
                       <span className="font-display text-[26px] font-black text-ink">{r.score}</span>
@@ -298,7 +325,7 @@ export default function MissionDetail() {
                       )}
                       {r.seed ? (
                         <span className="ml-2 text-[15px] italic text-ink-soft">
-                          {status === "sanity" ? t.sanitySeed : t.guildSeed}
+                          {status === "sanity" || status === "seed" ? t.sanitySeed : t.guildSeed}
                         </span>
                       ) : (
                         <a
@@ -339,14 +366,16 @@ export default function MissionDetail() {
                     key={c.author}
                     to={withLang(userPath(c.author), lang)}
                     onMouseEnter={tick}
-                    className="qrow grid grid-cols-[44px_44px_1fr_120px] items-center gap-3.5 px-4 py-[9px]"
+                    className="qrow grid grid-cols-[44px_44px_1fr_120px] items-center gap-3.5 px-4 py-[9px] max-md:grid-cols-[32px_36px_minmax(0,1fr)_auto] max-md:gap-2.5 max-md:px-3"
                   >
-                    <span className="text-center font-display text-[22px] text-medal-gold">
+                    <span className="text-center font-display text-[22px] text-medal-gold max-md:text-[16px]">
                       {roman(i + 1)}
                     </span>
                     <GithubAvatar author={c.author} size={36} border="#c9a227" />
-                    <span className="text-[19px] text-ink-body">{authorLabel(c.author)}</span>
-                    <span className="text-right text-[16px] font-bold text-gold">
+                    <span className="truncate text-[19px] text-ink-body max-md:text-[16px]">
+                      {authorLabel(c.author)}
+                    </span>
+                    <span className="whitespace-nowrap text-right text-[16px] font-bold text-gold max-md:text-[14px]">
                       {formatNumber(c.xp, lang)} {t.xp}
                     </span>
                   </Link>

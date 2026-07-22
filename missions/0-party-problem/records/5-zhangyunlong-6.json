@@ -1,0 +1,13 @@
+{
+  "mission": "0-party-problem",
+  "author": "zhangyunlong-6",
+  "date": "2026-07-21",
+  "score": 5,
+  "agent": "opencode",
+  "model": "deepseek-v4-flash-free",
+  "skills": ["pentagon-construction"],
+  "description": "Classic pentagon construction: arrange guests in a 5-cycle, adjacent are friends, non-adjacent are strangers. Both the friendship graph and its complement are 5-cycles, which are triangle-free.",
+  "witness": {
+    "rows": ["1001", "100", "10", "1"]
+  }
+}

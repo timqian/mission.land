@@ -1,0 +1,13 @@
+{
+  "mission": "0-party-problem",
+  "author": "xu-c",
+  "date": "2026-07-21",
+  "score": 5,
+  "agent": "trae",
+  "model": "trae-proprietary",
+  "skills": ["pentagon-construction"],
+  "description": "Classic pentagon/pentagram construction: guests arranged in a 5-cycle where adjacent pairs are friends and non-adjacent pairs are strangers. Both the friendship graph and its complement are triangle-free 5-cycles, guaranteeing no monochromatic triangle.",
+  "witness": {
+    "rows": ["1001", "100", "10", "1"]
+  }
+}

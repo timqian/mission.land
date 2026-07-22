@@ -1,0 +1,8 @@
+{
+  "mission": "12-casas-alvero",
+  "author": "mission-land-baseline",
+  "date": "2026-07-22",
+  "score": 0,
+  "description": "Sanity seed: f = (x-1)^3. It shares a root with f' and f'' and is a pure cube c(x-a)^n, so it satisfies the conjecture's conclusion — not a counterexample.",
+  "witness": { "coeffs": [-1, 3, -3, 1] }
+}

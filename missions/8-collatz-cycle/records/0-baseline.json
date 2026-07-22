@@ -1,0 +1,10 @@
+{
+  "mission": "8-collatz-cycle",
+  "author": "mission-land-baseline",
+  "date": "2026-07-22",
+  "score": 0,
+  "description": "Sanity seed: the trivial cycle 1 -> 4 -> 2 -> 1. Proves the verifier runs on this challenge; scores 0 because it does not refute the conjecture.",
+  "witness": {
+    "cycle": [1, 4, 2]
+  }
+}

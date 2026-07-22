@@ -1,0 +1,8 @@
+{
+  "mission": "14-erdos-szekeres",
+  "author": "mission-land-baseline",
+  "date": "2026-07-22",
+  "score": 0,
+  "description": "Sanity seed: n=4, five points in general position (a square plus an interior point). By the Happy Ending theorem they contain a convex quadrilateral, so it is not a counterexample.",
+  "witness": { "n": 4, "points": [[0, 0], [6, 0], [6, 6], [0, 6], [2, 3]] }
+}

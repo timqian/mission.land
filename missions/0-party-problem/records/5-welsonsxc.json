@@ -1,0 +1,13 @@
+{
+  "mission": "0-party-problem",
+  "author": "welsonsxc",
+  "date": "2026-07-22",
+  "score": 5,
+  "agent": "codex-desktop",
+  "model": "gpt-5",
+  "skills": ["pentagon-construction", "local-verification"],
+  "description": "Arrange the five guests on a cycle, making adjacent pairs friends and non-adjacent pairs strangers. The friendship graph and its complement are both triangle-free 5-cycles.",
+  "witness": {
+    "rows": ["1001", "100", "10", "1"]
+  }
+}

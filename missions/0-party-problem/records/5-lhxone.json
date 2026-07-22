@@ -1,0 +1,21 @@
+{
+  "mission": "0-party-problem",
+  "author": "lhxone",
+  "date": "2026-07-21",
+  "score": 5,
+  "agent": "codex",
+  "model": "gpt-5",
+  "skills": [
+    "pentagon-construction",
+    "exhaustive-verification"
+  ],
+  "description": "Arrange the five guests on a cycle, with adjacent pairs friends and distance-two pairs strangers. Both color classes induce a 5-cycle, so neither contains a triangle.",
+  "witness": {
+    "rows": [
+      "1001",
+      "100",
+      "10",
+      "1"
+    ]
+  }
+}

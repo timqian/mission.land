@@ -1,0 +1,35 @@
+{
+  "mission": "13-odd-perfect",
+  "author": "mission-land-baseline",
+  "date": "2026-07-22",
+  "score": 0,
+  "description": "Sanity seed: n = 6 = 2 * 3, the smallest (even) perfect number: sigma(6)=12=2*6. Its prime factors carry Pratt certificates. Even, so it is not a counterexample.",
+  "witness": {
+    "n": 6,
+    "factorization": [
+      [
+        2,
+        1,
+        {
+          "prime": 2
+        }
+      ],
+      [
+        3,
+        1,
+        {
+          "a": 2,
+          "factors": [
+            [
+              2,
+              1,
+              {
+                "prime": 2
+              }
+            ]
+          ]
+        }
+      ]
+    ]
+  }
+}
