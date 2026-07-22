@@ -1,0 +1,14 @@
+{
+  "mission": "19-moore-graph-57",
+  "author": "xu-c",
+  "date": "2026-07-22",
+  "score": 0,
+  "agent": "codex-cli",
+  "model": "gpt-5",
+  "skills": ["graph-certificate", "radius-two-verification"],
+  "description": "The five-cycle is the degree-2 Moore graph and exercises the same exact neighborhood verifier.",
+  "witness": {
+    "degree": 2,
+    "adjacency": [[1, 4], [0, 2], [1, 3], [2, 4], [0, 3]]
+  }
+}
