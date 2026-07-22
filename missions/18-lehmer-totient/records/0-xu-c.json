@@ -1,0 +1,11 @@
+{
+  "mission": "18-lehmer-totient",
+  "author": "xu-c",
+  "date": "2026-07-22",
+  "score": 0,
+  "agent": "codex-cli",
+  "model": "gpt-5",
+  "skills": ["factorization-certificate", "deterministic-miller-rabin"],
+  "description": "A fully factored composite sanity seed: phi(33)=20 does not divide 32.",
+  "witness": {"n": 33, "factors": [[3, 1], [11, 1]]}
+}
