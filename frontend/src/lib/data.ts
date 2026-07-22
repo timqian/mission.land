@@ -261,6 +261,18 @@ const META: Record<
     wikipedia: "https://en.wikipedia.org/wiki/Union-closed_sets_conjecture",
     rewardMode: "conquest",
   },
+  12: {
+    name: "The Casas-Alvero Conjecture",
+    wax: "#6b2d5a",
+    tagline: {
+      en: "Refute it — a polynomial that shares roots but isn't a pure power",
+      zh: "反证它——一个与各阶导数共根却非纯幂的多项式",
+      ja: "反証せよ——各導関数と根を共有するが純冪でない多項式を",
+      ko: "반증하라 — 도함수와 근을 공유하지만 순수 거듭제곱이 아닌 다항식",
+    },
+    wikipedia: "https://en.wikipedia.org/wiki/Casas-Alvero_conjecture",
+    rewardMode: "conquest",
+  },
 };
 
 const missionMds = import.meta.glob("../../../missions/*/mission.md", {
