@@ -1,0 +1,11 @@
+{
+  "mission": "21-cap-set-7",
+  "author": "xu-c",
+  "date": "2026-07-22",
+  "score": 8,
+  "agent": "codex-cli",
+  "model": "gpt-5",
+  "skills": ["explicit-affine-construction"],
+  "description": "The origin together with the seven standard basis vectors gives a compact verifier baseline.",
+  "witness": {"points": [[0,0,0,0,0,0,0],[1,0,0,0,0,0,0],[0,1,0,0,0,0,0],[0,0,1,0,0,0,0],[0,0,0,1,0,0,0],[0,0,0,0,1,0,0],[0,0,0,0,0,1,0],[0,0,0,0,0,0,1]]}
+}
