@@ -72,7 +72,7 @@ export type Mission = {
   literature: number;
   record: number;
   pct: number; // % of literature target claimed
-  literatureBroken: boolean; // record has reached/surpassed the literature record
+  literatureBroken: boolean; // record has strictly surpassed the literature record (matching it is not "broken")
   bounty: number; // XP for the next breakthrough
   adventurers: number;
   /** GitHub handle of whoever proposed this mission (meta.json), if recorded. */
@@ -446,9 +446,12 @@ function buildMission(
     literature,
     record,
     pct: literature ? Math.round((record / literature) * 100) : 0,
-    literatureBroken: literature > 0 && record >= literature,
-    // The next breakthrough is only guaranteed the literature bonus once the
-    // current record has already reached the published literature record.
+    // "Broken" means strictly beyond the published bound — merely matching it
+    // reproduces the literature result, it doesn't surpass it. (XP uses the same
+    // strict `>` at line ~424.)
+    literatureBroken: literature > 0 && record > literature,
+    // The next breakthrough is guaranteed the literature bonus once the current
+    // record has reached the published bound (the next push then exceeds it).
     bounty: literature && record >= literature ? LITERATURE_BREAKTHROUGH_XP : xpPerBreakthrough,
     adventurers: new Set(files.filter((r) => !isSeed(r.author)).map((r) => r.author)).size,
     proposedBy,
