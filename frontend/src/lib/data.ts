@@ -326,11 +326,6 @@ for (const [path, text] of Object.entries(i18nMissionMds)) {
   i18nBySlugLang.set(`${lang}:${filename.replace(/\.md$/, "")}`, text);
 }
 
-function localizedMd(lang: Lang, slug: string, englishMd: string): string {
-  if (lang === "en") return englishMd;
-  return i18nBySlugLang.get(`${lang}:${slug}`) ?? englishMd;
-}
-
 /** The "## Problem" heading is itself translated, so match per language. */
 const PROBLEM_HEADING: Record<Lang, string> = {
   en: "Problem",
@@ -421,12 +416,20 @@ function buildMission(
   const loreHtml = {} as Record<Lang, string>;
   const langSections = {} as Record<Lang, { title: string; body: string }[]>;
   for (const lang of LANGS) {
-    const langMd = localizedMd(lang, slug, md);
+    // Fall back to the English markdown when a mission has no translation — and,
+    // crucially, use the English section headings too, so we still find and show
+    // the English "## Problem" (matching on the translated heading "## 问题"
+    // against English text would come back empty).
+    const translated = lang === "en" ? md : i18nBySlugLang.get(`${lang}:${slug}`);
+    const langMd = translated ?? md;
+    const headingLang: Lang = translated ? lang : "en";
     const heading = langMd.match(/^# .*?—\s*(.+)$/m)?.[1]?.trim() ?? slug;
     const derivedName = heading.replace(/[:：].*$/, "");
     name[lang] = lang === "en" ? (meta.name ?? derivedName) : derivedName;
     tagline[lang] = meta.tagline?.[lang] ?? meta.tagline?.en ?? "Push the lower bound";
-    loreHtml[lang] = marked.parse(section(langMd, PROBLEM_HEADING[lang]), { async: false }) as string;
+    loreHtml[lang] = marked.parse(section(langMd, PROBLEM_HEADING[headingLang]), {
+      async: false,
+    }) as string;
     langSections[lang] = parseSections(langMd);
   }
 
