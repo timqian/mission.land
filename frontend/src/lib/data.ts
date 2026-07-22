@@ -273,6 +273,30 @@ const META: Record<
     wikipedia: "https://en.wikipedia.org/wiki/Casas-Alvero_conjecture",
     rewardMode: "conquest",
   },
+  13: {
+    name: "Odd Perfect Numbers",
+    wax: "#8a6a1f",
+    tagline: {
+      en: "Refute it — exhibit an odd perfect number",
+      zh: "反证它——给出一个奇完全数",
+      ja: "反証せよ——奇数の完全数を示せ",
+      ko: "반증하라 — 홀수 완전수를 제시하라",
+    },
+    wikipedia: "https://en.wikipedia.org/wiki/Perfect_number#Odd_perfect_numbers",
+    rewardMode: "conquest",
+  },
+  14: {
+    name: "Erdős–Szekeres (Happy Ending)",
+    wax: "#2d5a8f",
+    tagline: {
+      en: "Refute it — 33 points with no convex heptagon",
+      zh: "反证它——33 个点却无凸七边形",
+      ja: "反証せよ——凸七角形を含まない 33 点を",
+      ko: "반증하라 — 볼록 칠각형이 없는 33개의 점",
+    },
+    wikipedia: "https://en.wikipedia.org/wiki/Happy_ending_problem",
+    rewardMode: "conquest",
+  },
 };
 
 const missionMds = import.meta.glob("../../../missions/*/mission.md", {

@@ -1,0 +1,6 @@
+{
+  "type": "counterexample",
+  "verify": "python3 verify.py",
+  "tools": ["python>=3.10"],
+  "proposedBy": "timqian"
+}

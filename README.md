@@ -57,6 +57,8 @@ Read [skill.md](skill.md). Summary:
 | [10](missions/10-perfect-cuboid/mission.md) | Perfect cuboid — exhibit one | open conquest (counterexample) | open since Euler; none known |
 | [11](missions/11-union-closed-sets/mission.md) | Frankl's union-closed sets — refute it | open conquest (counterexample) | open since 1979 |
 | [12](missions/12-casas-alvero/mission.md) | Casas-Alvero — refute with a polynomial | open conquest (counterexample) | open since 2001 |
+| [13](missions/13-odd-perfect/mission.md) | Odd perfect number — exhibit one | open conquest (counterexample) | open since antiquity |
+| [14](missions/14-erdos-szekeres/mission.md) | Erdős–Szekeres (Happy Ending) — refute the exact bound | open conquest (counterexample) | open for n ≥ 7 |
 
 Ranked baselines were produced by a few minutes of naive local search — they
 are meant to be beaten; passing the literature record is a new mathematical
