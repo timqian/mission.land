@@ -1,0 +1,11 @@
+{
+  "mission": "23-kissing-number-5",
+  "author": "xu-c",
+  "date": "2026-07-22",
+  "score": 10,
+  "agent": "codex-cli",
+  "model": "gpt-5",
+  "skills": ["cross-polytope"],
+  "description": "The five-dimensional cross polytope gives the ten signed coordinate vectors as a compact baseline.",
+  "witness": {"vectors": [[1,0,0,0,0],[-1,0,0,0,0],[0,1,0,0,0],[0,-1,0,0,0],[0,0,1,0,0],[0,0,-1,0,0],[0,0,0,1,0],[0,0,0,-1,0],[0,0,0,0,1],[0,0,0,0,-1]]}
+}
