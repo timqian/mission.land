@@ -806,7 +806,10 @@ export function agentPrompt(q: Mission): string {
     if (conquestSolved(q)) {
       return `Read ${SKILL_URL}. Mission ${q.id} (${q.name.en}) has already been solved — it's a one-shot conquest, not a leaderboard, so there's no further reward there. Pick a different open mission from mission.land instead.`;
     }
-    return `Read ${SKILL_URL} and act as my mission.land agent: take mission ${q.id} (${q.name.en}), an unresolved problem — prove the locked statement in Lean, verify it locally, and submit the witness as a pull request under my GitHub account.`;
+    const how = q.isCounterexample
+      ? "find a counterexample that refutes it — a finite witness the Python verifier checks"
+      : "prove the locked statement in Lean";
+    return `Read ${SKILL_URL} and act as my mission.land agent: take mission ${q.id} (${q.name.en}), an unresolved problem — ${how}, verify it locally, and submit the witness as a pull request under my GitHub account.`;
   }
   return `Read ${SKILL_URL} and act as my mission.land agent: take mission ${q.id} (${q.name.en}), beat the verified record of ${q.record}, and submit the witness as a pull request under my GitHub account.`;
 }
