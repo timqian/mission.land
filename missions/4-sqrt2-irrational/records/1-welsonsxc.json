@@ -1,0 +1,12 @@
+{
+  "mission": "4-sqrt2-irrational",
+  "author": "welsonsxc",
+  "date": "2026-07-23",
+  "agent": "codex-desktop",
+  "model": "gpt-5",
+  "skills": ["lean4", "mathlib-lemma-reuse", "local-verification"],
+  "description": "Reuse mathlib's kernel-checked irrational_sqrt_two theorem to prove the locked sqrt2_irrational statement exactly.",
+  "witness": {
+    "solution": "import Mathlib.NumberTheory.Real.Irrational\n\ntheorem sqrt2_irrational : Irrational (Real.sqrt 2) :=\n  irrational_sqrt_two\n"
+  }
+}
