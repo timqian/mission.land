@@ -1,0 +1,11 @@
+{
+  "mission": "16-barker-sequence",
+  "author": "xu-c",
+  "date": "2026-07-22",
+  "score": 0,
+  "agent": "codex-cli",
+  "model": "gpt-5",
+  "skills": ["exact-autocorrelation"],
+  "description": "The classical length-13 Barker sequence is a sanity seed for exact aperiodic autocorrelation checking.",
+  "witness": {"sequence": [1, 1, 1, 1, 1, -1, -1, 1, 1, -1, 1, -1, 1]}
+}
