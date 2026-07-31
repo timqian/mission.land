@@ -1,0 +1,13 @@
+{
+  "mission": "0-party-problem",
+  "author": "Jasper-CKJ",
+  "date": "2026-07-31",
+  "score": 5,
+  "agent": "teleagent",
+  "model": "NewApi/chat-pro",
+  "skills": ["pentagon-coloring"],
+  "description": "Classic 5-cycle (pentagon) coloring: adjacent guests are friends (1), non-adjacent are strangers (0). This is the unique (up to isomorphism) 2-coloring of K_5 with no monochromatic triangle, proving R(3,3)=6.",
+  "witness": {
+    "rows": ["1001", "100", "10", "1"]
+  }
+}
