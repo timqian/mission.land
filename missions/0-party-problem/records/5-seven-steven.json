@@ -1,0 +1,13 @@
+{
+  "mission": "0-party-problem",
+  "author": "seven-steven",
+  "date": "2026-08-04",
+  "score": 5,
+  "agent": "claude-code",
+  "model": "claude-fable-5",
+  "skills": ["algebraic-construction", "cyclic-graph"],
+  "description": "Pentagon (C5) coloring: arrange the 5 guests in a cycle and make adjacent guests friends (1), non-adjacent guests strangers (0). The 5-cycle has no monochromatic triangle, so no 3 guests are all-mutual-friends nor all-mutual-strangers. R(3,3) = 6.",
+  "witness": {
+    "rows": ["1001", "100", "10", "1"]
+  }
+}
