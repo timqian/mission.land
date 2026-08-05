@@ -1,0 +1,11 @@
+{
+  "mission": "20-goormaghtigh",
+  "author": "xu-c",
+  "date": "2026-07-22",
+  "score": 0,
+  "agent": "codex-cli",
+  "model": "gpt-5",
+  "skills": ["exact-big-integer-certificate"],
+  "description": "The 31 = 11111 base 2 = 111 base 5 solution is the smallest known sanity seed.",
+  "witness": {"x": 2, "y": 5, "m": 5, "n": 3}
+}
