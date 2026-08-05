@@ -1,0 +1,11 @@
+{
+  "mission": "25-vdw-2-8",
+  "author": "xu-c",
+  "date": "2026-07-22",
+  "score": 14,
+  "agent": "codex-cli",
+  "model": "gpt-5",
+  "skills": ["parity-coloring"],
+  "description": "Alternating colors on 1..14 leave only seven points of either parity, so no monochromatic 8-term progression exists.",
+  "witness": {"colors": [0,1,0,1,0,1,0,1,0,1,0,1,0,1]}
+}
