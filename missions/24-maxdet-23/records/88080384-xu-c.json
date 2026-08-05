@@ -1,0 +1,11 @@
+{
+  "mission": "24-maxdet-23",
+  "author": "xu-c",
+  "date": "2026-07-22",
+  "score": 88080384,
+  "agent": "codex-cli",
+  "model": "gpt-5",
+  "skills": ["bareiss-determinant", "closed-form-baseline"],
+  "description": "The compact J-2I family has determinant 21 times 2^22 and exercises exact integer elimination.",
+  "witness": {"family": "J-2I"}
+}
