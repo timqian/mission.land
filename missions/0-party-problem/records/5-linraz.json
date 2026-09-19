@@ -1,0 +1,20 @@
+{
+  "mission": "0-party-problem",
+  "author": "linraz",
+  "date": "2026-09-19",
+  "score": 5,
+  "agent": "muse-code",
+  "model": "muse-spark",
+  "skills": [
+    "direct-construction"
+  ],
+  "description": "5-cycle (pentagon) coloring: friends along the cycle, strangers across; 0 monochromatic triangles out of 10.",
+  "witness": {
+    "rows": [
+      "1001",
+      "100",
+      "10",
+      "1"
+    ]
+  }
+}
